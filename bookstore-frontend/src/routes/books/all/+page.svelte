@@ -8,8 +8,8 @@
         {name: 'Steppenwolf', author: 'Hermann Hesse', publishDate: new Date("10.11.2000."), description: 'description......', rating: 4.0},
         {name: 'Gone with the Wind', author: 'Margaret Mitchell', publishDate: new Date("10.12.2000."), description: 'description......', rating: 4.2},
     ];*/
-	let columns = ['Author', 'Name', 'Pub date', 'Description', 'Rating'];
-	let columnNames = ['author', 'name', 'publishDate', 'description', 'rating'];
+	let columns = ['Author', 'Name', 'Pub date', 'Genre', 'Price'];
+	let columnNames = ['author.name', 'name', 'publishDate', 'genre', 'price'];
 
 	onMount(() => {
 		getBooks();
@@ -25,3 +25,6 @@
 <h1>Books page</h1>
 
 <Table data={books} {columns} {columnNames} />
+
+
+

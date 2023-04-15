@@ -27,6 +27,7 @@
 			})
 			.catch((err) => {
 				handleToast('Error!', 'Could not save book to bookstore!');
+				console.log(err)
 			});
 	}
 
