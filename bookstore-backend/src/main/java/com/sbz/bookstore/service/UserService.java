@@ -1,5 +1,6 @@
 package com.sbz.bookstore.service;
 
+import com.sbz.bookstore.model.Role;
 import com.sbz.bookstore.model.User;
 import com.sbz.bookstore.repository.UserRepository;
 
@@ -21,7 +22,8 @@ public class UserService {
 		return userRepository.findById(id).get();
 	}
 
-	public User createUser(User user) {
+	public User registerUser(User user) {
+		user.setRole(Role.USER);
 		return userRepository.save(user);
 	}
 

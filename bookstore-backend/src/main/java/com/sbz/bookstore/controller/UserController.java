@@ -35,9 +35,9 @@ public class UserController {
 		return ResponseEntity.ok(userService.getById(id));
 	}
 
-	@PostMapping("/new")
-	public ResponseEntity<User> createBook(@RequestBody User user) {
-		return ResponseEntity.ok(userService.createUser(user));
+	@PostMapping("/register")
+	public ResponseEntity<User> register(@RequestBody User user) {
+		return ResponseEntity.ok(userService.registerUser(user));
 	}
 
 	@PostMapping("/update")
