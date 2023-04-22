@@ -1,6 +1,7 @@
 package com.sbz.bookstore.service;
 
 import com.sbz.bookstore.config.KieConfig;
+import com.sbz.bookstore.model.Item;
 import com.sbz.bookstore.model.Order;
 import com.sbz.bookstore.repository.OrderRepository;
 import org.kie.api.runtime.KieContainer;
@@ -22,11 +23,18 @@ public class OrderService {
         // search for rules to apply to the items in the order that was just created
         KieContainer kieContainer = new KieConfig().kieContainer();
         KieSession kieSession = kieContainer.newKieSession();
-        kieSession.getAgenda().getAgendaGroup("item discounts").setFocus();
+
+        // add everything that's new to fact base
+        kieSession.insert(order);
+        for (Item item: order.getItems()) {
+            kieSession.insert(item);
+        }
+
+        kieSession.getAgenda().getActivationGroup("item discounts");
         kieSession.fireAllRules();
 
         // do the same for the order
-        kieSession.getAgenda().getAgendaGroup("order discounts").setFocus();
+        kieSession.getAgenda().getActivationGroup("order discounts");
         kieSession.fireAllRules();
 
         return orderRepository.save(order);
