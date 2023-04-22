@@ -78,6 +78,11 @@
 			<version>${drools.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.drools</groupId>
+			<artifactId>drools-xml-support</artifactId>
+			<version>${drools.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.kie</groupId>
 			<artifactId>kie-api</artifactId>
 			<version>${drools.version}</version>
@@ -115,6 +120,12 @@
 						</exclude>
 					</excludes>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.kie</groupId>
+				<artifactId>kie-maven-plugin</artifactId>
+				<version>${drools.version}</version>
+				<extensions>true</extensions>
 			</plugin>
 		</plugins>
 	</build>

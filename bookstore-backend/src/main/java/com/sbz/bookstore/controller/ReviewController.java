@@ -1,6 +1,7 @@
 package com.sbz.bookstore.controller;
 
 import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.CustomUserDetails;
 import com.sbz.bookstore.model.Review;
 import com.sbz.bookstore.service.ReviewService;
 
@@ -36,11 +37,11 @@ public class ReviewController {
 		return ResponseEntity.ok(reviewService.getById(id));
 	}
 
-	@PostMapping("/{bookId}/{ratingId}")
+	@PostMapping("/{bookId}/{rating}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> reviewBook(@PathVariable Long bookId, @PathVariable double rating) {
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		return ResponseEntity.ok(auth.getDetails());
+		Long userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+		return reviewService.reviewBook(userId, bookId, rating) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
 
 	@PostMapping("/update")
