@@ -9,6 +9,7 @@ rule "Two or more item quantity 10% discount"
         $i: Item(quantity > 2)
     then
         modify($i){setDiscount($i.getDiscount() + 0.1);}
+        System.out.println($i.getDiscount());
 end
 
 rule "3000 or more item price 5% discount"
