@@ -27,6 +27,6 @@ public class Order extends BaseEntity{
 	double discount;
 
 	@OneToMany(mappedBy = "order", orphanRemoval = true)
-	@JsonManagedReference
+	@JsonManagedReference("orderBackReference")
 	List<Item> items;
 }

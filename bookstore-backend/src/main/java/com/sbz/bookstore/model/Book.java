@@ -47,6 +47,6 @@ public class Book extends BaseEntity {
 	Genre genre;
 
 	@OneToMany(mappedBy = "book", orphanRemoval = true)
-	@JsonManagedReference
+	@JsonManagedReference("bookBackReference")
 	List<Review> reviews;
 }

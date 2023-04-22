@@ -24,11 +24,11 @@ public class Item extends BaseEntity{
 
 	@ManyToOne
 	@JoinColumn(name = "order_id", nullable = false)
-	@JsonBackReference
+	@JsonBackReference("orderBackReference")
 	Order order;
 
 	@Column
-	int discount;
+	double discount;
 
 	@Column
 	int quantity;
