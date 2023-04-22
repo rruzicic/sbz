@@ -1,6 +1,5 @@
 package com.sbz.bookstore.controller;
 
-import com.sbz.bookstore.model.Book;
 import com.sbz.bookstore.model.CustomUserDetails;
 import com.sbz.bookstore.model.Review;
 import com.sbz.bookstore.service.ReviewService;
@@ -10,7 +9,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,8 +38,9 @@ public class ReviewController {
 	@PostMapping("/{bookId}/{rating}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> reviewBook(@PathVariable Long bookId, @PathVariable double rating) {
-		Long userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+		Long userId = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 		return reviewService.reviewBook(userId, bookId, rating) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+
 	}
 
 	@PostMapping("/update")
