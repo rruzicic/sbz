@@ -28,7 +28,7 @@ public class Item extends BaseEntity{
 	Order order;
 
 	@Column
-	int discount;
+	double discount;
 
 	@Column
 	int quantity;

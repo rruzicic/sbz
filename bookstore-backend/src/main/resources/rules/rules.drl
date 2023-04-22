@@ -1,8 +1,44 @@
-import com.sbz.bookstore.model.Author;
+import com.sbz.bookstore.model.Order;
+import com.sbz.bookstore.model.Item;
+import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.Genre;
 
-rule "Print Author Name"
+rule "Two or more item quantity 10% discount"
+    agenda-group "item discounts"
     when
-        Author(name == "George Orwell")
+        $i: Item(quantity > 2)
     then
-        System.out.println("Hi George");
+        modify($i){setDiscount($i.getDiscount() + 0.1);}
+end
+
+rule "3000 or more item price 5% discount"
+    agenda-group "item discounts"
+    when
+        $i: Item(book.getPrice() * quantity >= 3000)
+    then
+        modify($i){setDiscount($i.getDiscount() + 0.05);}
+end
+
+rule "2000 or more item price and education 7% discount"
+    agenda-group "item discounts"
+    when
+        $i: Item(book.getPrice() * quantity >= 2000, book.getGenre() == Genre.EDUCATION)
+    then
+        modify($i){setDiscount($i.getDiscount() + 0.07);}
+end
+
+rule "3 or more items in order 10% discount"
+    agenda-group "order discounts"
+    when
+        $o: Order(items.size() >= 3)
+    then
+        modify($o){setDiscount($o.getDiscount() + 0.1);}
+end
+
+rule "5 or more items in order 15% discount"
+    agenda-group "order discounts"
+    when
+        $o: Order(items.size() >= 5)
+    then
+        modify($o){setDiscount($o.getDiscount() + 0.15);}
 end
