@@ -54,6 +54,7 @@ public class User extends BaseEntity {
 		this.name = user.getName();;
 		this.password = user.getPassword();
 		//this.reviews = user.getReviews();
+		this.reviews = user.getReviews();
 		this.favouriteGenres = user.getFavouriteGenres();
 		this.role = user.getRole();
 	}
