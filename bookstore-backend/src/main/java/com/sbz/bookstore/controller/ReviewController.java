@@ -2,7 +2,10 @@ package com.sbz.bookstore.controller;
 
 import com.sbz.bookstore.model.Book;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import com.sbz.bookstore.model.CustomUserDetails;
+=======
+>>>>>>> 968b6c3 (feat: add book review)
 =======
 >>>>>>> 968b6c3 (feat: add book review)
 import com.sbz.bookstore.model.Review;
