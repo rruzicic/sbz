@@ -1,6 +1,7 @@
 package com.sbz.bookstore.config;
 
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
@@ -21,12 +22,12 @@ public class KieConfig {
 	private static final String RULES_PATH = "/rules";
 	
 	@Bean
-	public KieContainer kieContainer() throws IOException{
+	public KieContainer kieContainer(){
 		KieServices kieServices = KieServices.Factory.get();
 
 		KieFileSystem kieFileSystem = kieServices.newKieFileSystem();
 		for (Resource file : getRulesFiles()) {
-			kieFileSystem.write(ResourceFactory.newClassPathResource(RULES_PATH + file.getFilename(), "UTF-8"));
+			kieFileSystem.write(ResourceFactory.newClassPathResource(Paths.get(RULES_PATH, file.getFilename()).toString(), "UTF-8"));
 		}
 
 		KieBuilder kieBuilder = kieServices.newKieBuilder(kieFileSystem);
@@ -39,8 +40,14 @@ public class KieConfig {
 
 	}
 
-	private Resource[] getRulesFiles() throws IOException {
+	private Resource[] getRulesFiles() {
+		try{
 		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 		return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
+		}
+		catch (IOException e){
+
+		}
+		return null;
 	}
 }

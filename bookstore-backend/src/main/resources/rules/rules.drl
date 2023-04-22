@@ -1,0 +1,8 @@
+import com.sbz.bookstore.model.Author;
+
+rule "Print Author Name"
+    when
+        Author(name == "George Orwell")
+    then
+        System.out.println("Hi George");
+end
