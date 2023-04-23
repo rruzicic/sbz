@@ -5,8 +5,7 @@
 	import axios from 'axios';
 	import { required, validate } from '../../../lib/util/validate';
 	import { toast } from '../../../lib/stores/toast';
-
-	let genreList = ['EDUCATION', 'NOVEL', 'ROMANCE']
+	import GenreSelect from '../../../lib/GenreSelect.svelte';
 
 	let book = {
 		name: '',
@@ -65,12 +64,7 @@
 	errors={errorMessages.publishDate}
 />
 <Input label="Price" bind:value={book.price} errors={errorMessages.price} />
+<GenreSelect bind:genre={book.genre}/>
 
-Genre:<br>
-<select class="form-select" bind:value={book.genre}>
-	{#each genreList as genre}
-		<option value={genre}>{genre}</option>
-	{/each}
-</select>
 
 <button on:click={handleSubmit} class="btn btn-primary" disabled={!valid}>Submit</button>
