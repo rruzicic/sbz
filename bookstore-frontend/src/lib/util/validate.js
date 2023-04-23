@@ -24,7 +24,6 @@ export function validate(model, modelValidation, modelErrMsg = undefined) {
 				} else {
 					modelErrOut[key][idx] = modelErrMsg[key][idx];
 				}
-
 				isValid = false;
 			} else {
 				modelErrOut[key][idx] = '';

@@ -1,5 +1,7 @@
 package com.sbz.bookstore.controller;
 
+import com.sbz.bookstore.dto.LoggedUserBasicInfoDTO;
+import com.sbz.bookstore.dto.UserCredentialsDTO;
 import com.sbz.bookstore.model.User;
 import com.sbz.bookstore.service.UserService;
 
@@ -23,6 +25,16 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
+
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody UserCredentialsDTO credentials) {
+		User user = userService.login(credentials.getEmail(), credentials.getPassword());
+		if(user == null) { return ResponseEntity.badRequest().build(); }
+		LoggedUserBasicInfoDTO loggedUser = new LoggedUserBasicInfoDTO();
+		loggedUser.setRole(user.getRole());
+		loggedUser.setName(user.getName());
+		return ResponseEntity.ok(loggedUser);
+	}
 
 	@PreAuthorize("hasAnyRole('ADMIN')")
 	@GetMapping("/all")

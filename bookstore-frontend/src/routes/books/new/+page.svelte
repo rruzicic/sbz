@@ -1,20 +1,27 @@
 <script>
+	import { onMount } from 'svelte';
 	import Input from '../../../lib/Input.svelte';
-	import { required, validate } from '../../../lib/util/validate';
+	import AuthorSelect from '../../../lib/AuthorSelect.svelte';
 	import axios from 'axios';
+	import { required, validate } from '../../../lib/util/validate';
 	import { toast } from '../../../lib/stores/toast';
+
+	let genreList = ['EDUCATION', 'NOVEL', 'ROMANCE']
+
 	let book = {
 		name: '',
-		author: '',
+		author: {id: null},
 		publishDate: null,
-		description: ''
+		price: 0,
+		genre: 'EDUCATION',
 	};
 
 	let bookValidator = {
 		name: [required],
-		author: [required],
+		author: [],
 		publishDate: [required],
-		description: [required]
+		price: [required],
+		genre: []
 	};
 
 	$: [errorMessages, valid] = validate(book, bookValidator);
@@ -30,6 +37,14 @@
 				console.log(err)
 			});
 	}
+	let authorList = [];
+
+	onMount(() => {
+		axios.get("http://localhost:8080/author/all")
+		.then((res) => {
+			authorList = res.data;
+		})
+	});
 
 	function handleToast(title, text) {
 		$toast.id = 'liveToast';
@@ -37,40 +52,25 @@
 		$toast.text = text;
 		setTimeout(() => new bootstrap.Toast(document.querySelector('#liveToast')).show(), 10);
 	}
-
-	function sendToast() {
-		handleToast('Toast notification', 'Some toast notification!');
-	}
-
 </script>
 
 <h1>Add a new book</h1>
 
 <Input label="Name" bind:value={book.name} errors={errorMessages.name} />
-<Input label="Author" bind:value={book.author} errors={errorMessages.author} />
+<AuthorSelect authorList={authorList} bind:selected={book.author.id}/>
 <Input
 	label="Publish date"
 	type="date"
 	bind:value={book.publishDate}
 	errors={errorMessages.publishDate}
 />
+<Input label="Price" bind:value={book.price} errors={errorMessages.price} />
 
-Description:
-<textarea
-	type="textarea"
-	class="form-control"
-	rows="3"
-	bind:value={book.description}
-	errors={errorMessages.description}
-/>
-<span class="text-danger">
-	{#each errorMessages.description as error}
-		{#if error !== ''}
-			{error}<br />
-		{/if}
+Genre:<br>
+<select class="form-select" bind:value={book.genre}>
+	{#each genreList as genre}
+		<option value={genre}>{genre}</option>
 	{/each}
-</span>
+</select>
 
 <button on:click={handleSubmit} class="btn btn-primary" disabled={!valid}>Submit</button>
-
-<button type="button" class="btn btn-danger" on:click={sendToast}>Join us</button>

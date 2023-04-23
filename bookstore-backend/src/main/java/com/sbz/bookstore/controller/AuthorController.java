@@ -1,6 +1,7 @@
 package com.sbz.bookstore.controller;
 
-import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.Author;
+import com.sbz.bookstore.service.AuthorService;
 import com.sbz.bookstore.service.BookService;
 
 import java.util.List;
@@ -16,33 +17,33 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/book")
-public class BookController {
+@RequestMapping("/author")
+public class AuthorController {
 	@Autowired
-	private BookService bookService;
+	private AuthorService authorService;
 
 	@GetMapping("/all")
-	public ResponseEntity<List<Book>> getAll() {
-		return ResponseEntity.ok(bookService.getAll());
+	public ResponseEntity<List<Author>> getAll() {
+		return ResponseEntity.ok(authorService.getAll());
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Book> getById(@PathVariable Long id) {
-		return ResponseEntity.ok(bookService.getById(id));
+	public ResponseEntity<Author> getById(@PathVariable Long id) {
+		return ResponseEntity.ok(authorService.getById(id));
 	}
 
 	@PostMapping(value = "/new", consumes = "application/json")
-	public ResponseEntity<Book> createBook(@RequestBody Book book) {
-		return bookService.createBook(book) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	public ResponseEntity<Author> createAuthor(@RequestBody Author author) {
+		return ResponseEntity.ok(authorService.createBook(author));
 	}
 
 	@PostMapping("/update")
-	public ResponseEntity<Book> update(@RequestBody Book book) {
-		return ResponseEntity.ok(bookService.updateBook(book));
+	public ResponseEntity<Author> update(@RequestBody Author author) {
+		return ResponseEntity.ok(authorService.updateBook(author));
 	}
 
 	@DeleteMapping("/{id}")
 	public ResponseEntity<?> delete(@PathVariable Long id) {
-		return bookService.deleteBook(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+		return authorService.deleteBook(id) ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
 }
