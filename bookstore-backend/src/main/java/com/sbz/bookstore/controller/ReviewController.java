@@ -39,8 +39,9 @@ public class ReviewController {
 	@PostMapping("/{bookId}/{rating}")
 	@PreAuthorize("hasRole('USER')")
 	public ResponseEntity<?> reviewBook(@PathVariable Long bookId, @PathVariable double rating) {
-		Long userId = ((CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+		Long userId = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 		return reviewService.reviewBook(userId, bookId, rating) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+
 	}
 
 	@PostMapping("/update")
