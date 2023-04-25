@@ -12,9 +12,9 @@ INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, pu
 INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price) VALUES ('Of Mice and Men', 		    	5, 1000, '2020-1-1', '1937-01-01', 	'EDUCATION', 900);
 
 
-INSERT INTO bookstore_user (name, email, password) VALUES ('Petar Petrovic', 'pera@pera.com', '123.Auth');
-INSERT INTO bookstore_user (name, email, password) VALUES ('Ana Anic', 'ana@ana.com', '123.Auth');
-INSERT INTO bookstore_user (name, email, password) VALUES ('Milos Milic', 'milos@milos.com', '123.Auth');
+INSERT INTO bookstore_user (name, email, password, role) VALUES ('Petar Petrovic', 'pera@pera.com', '123.Auth', 'ADMIN');
+INSERT INTO bookstore_user (name, email, password, role) VALUES ('Ana Anic', 'ana@ana.com', '123.Auth', 'USER');
+INSERT INTO bookstore_user (name, email, password, role) VALUES ('Milos Milic', 'milos@milos.com', '123.Auth', 'USER');
 
 INSERT INTO book_order (discount, user_id) VALUES (0, 1);
 INSERT INTO book_order (discount, user_id) VALUES (0, 2);

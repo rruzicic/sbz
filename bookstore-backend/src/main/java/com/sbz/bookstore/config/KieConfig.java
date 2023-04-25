@@ -7,7 +7,6 @@ import org.kie.api.KieServices;
 import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieModule;
-import org.kie.api.builder.KieScanner;
 import org.kie.api.runtime.KieContainer;
 import org.kie.internal.io.ResourceFactory;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +19,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 public class KieConfig {
 
 	private static final String RULES_PATH = "/rules";
-	
+
 	@Bean
 	public KieContainer kieContainer(){
 		KieServices kieServices = KieServices.Factory.get();
@@ -34,16 +33,16 @@ public class KieConfig {
 		kieBuilder.buildAll();
 		KieModule kieModule = kieBuilder.getKieModule();
 		KieContainer kieContainer = kieServices.newKieContainer(kieModule.getReleaseId());
-		KieScanner kieScanner = kieServices.newKieScanner(kieContainer);
-		kieScanner.start(2000);
+		// comment the following line to avoid getting infinite warnings
+		kieServices.newKieScanner(kieContainer).start(2000);
 		return kieContainer;
 
 	}
 
 	private Resource[] getRulesFiles() {
 		try{
-		ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
-		return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
+			ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+			return resourcePatternResolver.getResources("classpath*:" + RULES_PATH + "**/*.*");
 		}
 		catch (IOException e){
 
