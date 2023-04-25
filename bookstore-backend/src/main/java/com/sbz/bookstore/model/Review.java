@@ -20,12 +20,12 @@ import lombok.experimental.FieldDefaults;
 public class Review extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
-	@JsonBackReference
+	@JsonBackReference("userBackReference")
 	User user;
 
 	@ManyToOne
 	@JoinColumn(name = "book_id", nullable = false)
-	@JsonBackReference
+	@JsonBackReference("bookBackReference")
 	Book book;
 
 	@Column

@@ -14,7 +14,9 @@
       {#each columns as column}
         <th>{column}</th>
       {/each}
+      <th >Quantity</th>
     </tr>
+    
   </thead>
   <tbody>
     {#each data as row}
@@ -32,6 +34,8 @@
             {/if}
           </td>
         {/each}
+        <td ><input style="width: 70px"type="number" min=0></td>
+          
       </tr>
     {/each}
   </tbody>

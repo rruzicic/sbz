@@ -33,7 +33,7 @@ public class User extends BaseEntity {
 	String password;
 
 	@OneToMany(mappedBy = "user", orphanRemoval = true)
-	@JsonManagedReference
+	@JsonManagedReference("userBackReference")
 	List<Review> reviews;
 
 	@ElementCollection

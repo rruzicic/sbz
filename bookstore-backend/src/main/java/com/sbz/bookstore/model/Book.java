@@ -38,6 +38,9 @@ public class Book extends BaseEntity {
 	LocalDate publishDate;
 
 	@Column
+	int numberOfCopies;
+
+	@Column
 	LocalDate addedToBookstoreDate;
 
 	@Column
@@ -47,6 +50,6 @@ public class Book extends BaseEntity {
 	Genre genre;
 
 	@OneToMany(mappedBy = "book", orphanRemoval = true)
-	@JsonManagedReference
+	@JsonManagedReference("bookBackReference")
 	List<Review> reviews;
 }
