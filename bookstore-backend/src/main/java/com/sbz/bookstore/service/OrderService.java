@@ -51,4 +51,12 @@ public class OrderService {
 
         return itemsPriceWithoutDiscount * (1.0 - order.getDiscount());
     }
+
+    public boolean deleteOrder(Long id) {
+        if (orderRepository.existsById(id)) {
+            orderRepository.deleteById(id);
+            return true;
+        }
+        return false;
+    }
 }

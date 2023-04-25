@@ -38,6 +38,9 @@ public class Book extends BaseEntity {
 	LocalDate publishDate;
 
 	@Column
+	int numberOfCopies;
+
+	@Column
 	LocalDate addedToBookstoreDate;
 
 	@Column
