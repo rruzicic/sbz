@@ -34,7 +34,7 @@ public class KieConfig {
 		KieModule kieModule = kieBuilder.getKieModule();
 		KieContainer kieContainer = kieServices.newKieContainer(kieModule.getReleaseId());
 		// comment the following line to avoid getting infinite warnings
-		kieServices.newKieScanner(kieContainer).start(2000);
+		//kieServices.newKieScanner(kieContainer).start(2000);
 		return kieContainer;
 
 	}

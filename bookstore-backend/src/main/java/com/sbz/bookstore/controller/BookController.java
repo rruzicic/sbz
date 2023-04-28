@@ -26,6 +26,11 @@ public class BookController {
 		return ResponseEntity.ok(bookService.getAll());
 	}
 
+	@GetMapping("/recommend/unauth")
+	public ResponseEntity<List<Book>> recommendToUnauthorized() {
+		return ResponseEntity.ok(bookService.getRecommendedUnauthorized());
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Book> getById(@PathVariable Long id) {
 		return ResponseEntity.ok(bookService.getById(id));

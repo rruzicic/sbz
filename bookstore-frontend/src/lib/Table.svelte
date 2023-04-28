@@ -34,7 +34,7 @@
             {/if}
           </td>
         {/each}
-        <td ><input style="width: 70px"type="number" min=0></td>
+        <td ><input class="form-control" style="width: 70px" type="number" min=0></td>
           
       </tr>
     {/each}
