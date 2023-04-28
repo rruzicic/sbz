@@ -1,5 +1,6 @@
 package com.sbz.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,4 +55,23 @@ public class Book extends BaseEntity {
 	@OneToMany(mappedBy = "book", orphanRemoval = true)
 	@JsonManagedReference("bookBackReference")
 	List<Review> reviews;
+
+	@JsonInclude
+	@Transient
+	boolean new_;
+	@JsonInclude
+	@Transient
+	boolean isPopular;
+	@JsonInclude
+	@Transient
+	RatingLevel rating;
+	@Transient
+	public double getAverageRating() {
+		if (reviews.size() == 0) return 0;
+		double ratingSum = 0;
+		for (Review review: reviews) {
+			ratingSum += review.getRating();
+		}
+		return ratingSum / reviews.size();
+	}
 }
