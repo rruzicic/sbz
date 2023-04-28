@@ -4,6 +4,7 @@
 	import GenericTable from '../../../lib/GenericTable.svelte';
 	import axios from 'axios';
 	import { toast } from '../../../lib/stores/toast';
+	import { user } from '../../../lib/stores/user';
 	let books;
 
 	let columns = ['Author', 'Name', 'Pub date', 'Genre', 'Price', 'Copies'];
@@ -13,6 +14,12 @@
 	let orderData;
 	let orderId = -1;
 	let discount = 0;
+
+	let config = {
+		headers: {
+			Authorization: `Basic ${$user.base64token}`
+		}
+	};
 
 	class Order {
 		constructor(book, quantity) {
@@ -59,7 +66,7 @@
 			discount: 0
 		};
 		const res = await axios
-			.post('http://localhost:8080/order/new', newOrder)
+			.post('http://localhost:8080/order/new', newOrder, config)
 			.then((res) => {
 				handleToast('Success!', 'You have successfully created order!');
 				discount = res.data.totalPrice;
@@ -84,9 +91,7 @@
 		discount = 0;
 		if ((orderId = -1)) return;
 
-		fetch(`http://localhost:8080/order/${orderId}`, {
-			method: 'DELETE'
-		})
+		axios.delete(`http://localhost:8080/order/${orderId}`)
 			.then((response) => {
 				handleToast('Success!', 'You have successfully deleted order!');
 			})
@@ -99,9 +104,9 @@
 	}
 
 	async function buyBooks() {
-		const response = await fetch(`http://localhost:8080/order/buy/${orderId}`);
+		const response = axios.get(`http://localhost:8080/order/buy/${orderId}`, config);
 
-		books = await response.json();
+		//books = await response.json();
 
 		orderId = -1;
 		discount = 0;
@@ -113,14 +118,23 @@
 
 <div>
 	<Table data={books} {columns} {columnNames} />
-	<button on:click={previewOrder} class="btn btn-primary" style="float: right; width: 70px; margin-right: 5.5%;">
-		Order
-	</button>
-	<div>
-		<h2>Confirm your order:</h2>
-		<GenericTable data={orderData} columns={orderColumns} columnNames={orderColumnsNames} />
-		<h5>Total price with discount: {discount}</h5>
-		<button class="btn btn-primary" on:click={cancelOrder}>Cancel</button>
-		<button class="btn btn-primary" on:click={buyBooks} style="float: right; margin-right: 5.5%;">Cash on delivery</button>
-	</div>
+
+	{#if $user.base64token !== ''}
+		<button
+			on:click={previewOrder}
+			class="btn btn-primary"
+			style="float: right; width: 70px; margin-right: 5.5%;"
+		>
+			Order
+		</button>
+		<div>
+			<h2>Confirm your order:</h2>
+			<GenericTable data={orderData} columns={orderColumns} columnNames={orderColumnsNames} />
+			<h5>Total price with discount: {discount}</h5>
+			<button class="btn btn-primary" on:click={cancelOrder}>Cancel</button>
+			<button class="btn btn-primary" on:click={buyBooks} style="float: right; margin-right: 5.5%;" disabled="{orderId === -1}">
+				Cash on delivery
+			</button>
+		</div>
+	{/if}
 </div>
