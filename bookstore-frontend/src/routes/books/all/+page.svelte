@@ -91,7 +91,8 @@
 		discount = 0;
 		if ((orderId = -1)) return;
 
-		axios.delete(`http://localhost:8080/order/${orderId}`)
+		axios
+			.delete(`http://localhost:8080/order/${orderId}`)
 			.then((response) => {
 				handleToast('Success!', 'You have successfully deleted order!');
 			})
@@ -132,7 +133,12 @@
 			<GenericTable data={orderData} columns={orderColumns} columnNames={orderColumnsNames} />
 			<h5>Total price with discount: {discount}</h5>
 			<button class="btn btn-primary" on:click={cancelOrder}>Cancel</button>
-			<button class="btn btn-primary" on:click={buyBooks} style="float: right; margin-right: 5.5%;" disabled="{orderId === -1}">
+			<button
+				class="btn btn-primary"
+				on:click={buyBooks}
+				style="float: right; margin-right: 5.5%;"
+				disabled={orderId === -1}
+			>
 				Cash on delivery
 			</button>
 		</div>
