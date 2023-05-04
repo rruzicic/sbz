@@ -59,6 +59,6 @@
 
 	<button on:click={handleLogin} class="btn btn-primary" disabled={!valid}>Login</button>
 </form>
-<p>
+<!--<p>
 	{JSON.stringify(credentials)}
-</p>
+</p>-->

@@ -94,7 +94,7 @@
 		axios
 			.delete(`http://localhost:8080/order/${orderId}`)
 			.then((response) => {
-				handleToast('Success!', 'You have successfully deleted order!');
+				handleToast('Success!', 'You have successfully canceled order!');
 			})
 			.catch((err) => {
 				handleToast('Error!', 'Error during deleting order!');
@@ -105,7 +105,12 @@
 	}
 
 	async function buyBooks() {
-		const response = axios.get(`http://localhost:8080/order/buy/${orderId}`, config);
+		axios.get(`http://localhost:8080/order/buy/${orderId}`, config).then(response => {
+      		books = response.data;
+    	})
+    	.catch(error => {
+      		console.log(error);
+    	});;
 
 		//books = await response.json();
 
