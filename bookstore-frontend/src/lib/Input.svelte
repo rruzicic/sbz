@@ -6,6 +6,9 @@
 
 	function typeAction(node) {
 		node.type = type;
+		if (type === 'number') {
+			node.setAttribute('min', '0'); 
+		}
 	}
 </script>
 

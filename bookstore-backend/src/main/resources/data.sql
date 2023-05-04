@@ -3,7 +3,7 @@ INSERT INTO author (name) VALUES ('Fyodor Dostoyevsky');
 INSERT INTO author (name) VALUES ('Aldous Huxley');
 INSERT INTO author (name) VALUES ('George Orwell');
 INSERT INTO author (name) VALUES ('John Steinback');
-INSERT INTO author (name) VALUES ('Vojislav Seselj');
+
 INSERT INTO author (name) VALUES ('Herman Hesse');
 INSERT INTO author (name) VALUES ('Robert Cecil Martin');
 
@@ -19,11 +19,9 @@ INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, pu
 INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
 	VALUES ('Of Mice and Men', 5, 1000, '2020-1-1', '2023-03-01', 'EDUCATION', 900);
 INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
-	VALUES ('Engleski pe***ski is***ak Toni Bler', 6, 100, '2022-1-1', '2023-01-01', 'EDUCATION', 900);
+	VALUES ('Siddhartha', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 900);
 INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
-	VALUES ('Siddhartha', 7, 100, '2022-1-1', '2023-01-01', 'NOVEL', 900);
-INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
-	VALUES ('Clean Code', 8, 100, '2022-1-1', '2023-01-01', 'EDUCATION', 900);
+	VALUES ('Clean Code', 7, 100, '2022-1-1', '2023-01-01', 'EDUCATION', 900);
 
 
 INSERT INTO bookstore_user (name, email, password, role) VALUES ('Petar Petrovic', 'pera@pera.com', '123.Auth', 'ADMIN');

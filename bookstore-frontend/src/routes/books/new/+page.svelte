@@ -72,7 +72,7 @@
 	errors={errorMessages.publishDate}
 />
 <Input type="number" label="Price" bind:value={book.price} errors={errorMessages.price} />
-<Input label="NumberOfCopies" bind:value={book.numberOfCopies} errors={errorMessages.numberOfCopies} />
+<Input type="number" label="NumberOfCopies" bind:value={book.numberOfCopies} errors={errorMessages.numberOfCopies} />
 <GenreSelectBook bind:genre={book.genre}/>
 
 
