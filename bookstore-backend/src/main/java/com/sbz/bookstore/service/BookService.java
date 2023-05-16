@@ -1,14 +1,13 @@
 package com.sbz.bookstore.service;
 
 import com.sbz.bookstore.config.KieConfig;
-import com.sbz.bookstore.model.Author;
-import com.sbz.bookstore.model.Book;
-import com.sbz.bookstore.model.Item;
-import com.sbz.bookstore.model.RatingLevel;
-import com.sbz.bookstore.model.Review;
+import com.sbz.bookstore.model.*;
+import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
 import com.sbz.bookstore.model.facts.UnauthorizedUserRecommendedBooks;
 import com.sbz.bookstore.repository.AuthorRepository;
 import com.sbz.bookstore.repository.BookRepository;
+import com.sbz.bookstore.repository.UserRepository;
+import com.sbz.bookstore.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,6 +24,9 @@ public class BookService {
 	private BookRepository bookRepository;
 	@Autowired
 	private AuthorRepository authorRepository;
+
+	@Autowired
+	private UserRepository userRepository;
 
 	public List<Book> getAll() {
 		return bookRepository.findAll();
@@ -50,6 +52,23 @@ public class BookService {
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("remove").setFocus();
 		kieSession.fireAllRules();
+		return recommendedBooks.getRecommendedBooks();
+	}
+
+	public List<Book> getRecommendedRegular(Long userId){
+		KieContainer kieContainer = new KieConfig().kieContainer();
+		KieSession kieSession = kieContainer.newKieSession();
+		List<Book> books = getAll();
+		for (Book book: books) {
+			kieSession.insert(book);
+		}
+		User regularUser = userRepository.findById(userId).get();
+		kieSession.insert(regularUser);
+		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
+		kieSession.insert(recommendedBooks);
+
+		//TODO Fire rules from the rules engine
+
 		return recommendedBooks.getRecommendedBooks();
 	}
 
