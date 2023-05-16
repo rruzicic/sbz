@@ -4,6 +4,7 @@ import com.sbz.bookstore.config.KieConfig;
 import com.sbz.bookstore.model.*;
 import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
 import com.sbz.bookstore.model.facts.UnauthorizedUserRecommendedBooks;
+import com.sbz.bookstore.model.facts.UserStatus;
 import com.sbz.bookstore.repository.AuthorRepository;
 import com.sbz.bookstore.repository.BookRepository;
 import com.sbz.bookstore.repository.UserRepository;
@@ -66,6 +67,8 @@ public class BookService {
 		kieSession.insert(regularUser);
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
 		kieSession.insert(recommendedBooks);
+		UserStatus userStatus = new UserStatus();
+		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
 
