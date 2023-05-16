@@ -32,7 +32,7 @@ public class UserController {
 		if(user == null) { return ResponseEntity.badRequest().build(); }
 		LoggedUserBasicInfoDTO loggedUser = new LoggedUserBasicInfoDTO();
 		loggedUser.setRole(user.getRole());
-		loggedUser.setName(user.getName());
+		loggedUser.setName(user.getFirstName() + " " + user.getLastName());
 		return ResponseEntity.ok(loggedUser);
 	}
 

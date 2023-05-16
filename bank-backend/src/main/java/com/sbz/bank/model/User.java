@@ -25,28 +25,35 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @NoArgsConstructor
 public class User extends BaseEntity {
-
 	@Column
 	String email;
+	@Column
+	String firstName;
 
 	@Column
-	String name;
-
+	String lastName;
 	@Column
 	String password;
-
 	@Column
 	@Enumerated(EnumType.STRING)
 	Role role;
 
+	@Column
+	@OneToMany(mappedBy = "owner", orphanRemoval = true)
+	@JsonManagedReference("userBackReference")
+	List<BankAccount> accounts;
+
+	@Column
+	@OneToMany(mappedBy = "submitter", orphanRemoval = true)
+	@JsonManagedReference("requestsBackReference")
+	List<CreditRequest> creditRequests;
+
+
 	public User(User user) {
 		this.id = user.getId();
 		this.email = user.getEmail();
-		this.name = user.getName();;
+		this.firstName = user.getFirstName();
 		this.password = user.getPassword();
-		//this.reviews = user.getReviews();
-		//this.reviews = user.getReviews();
-		//this.favouriteGenres = user.getFavouriteGenres();
 		this.role = user.getRole();
 	}
 }
