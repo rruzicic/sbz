@@ -1,0 +1,25 @@
+import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.RatingLevel;
+import com.sbz.bookstore.model.Genre;
+import com.sbz.bookstore.model.User;
+import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
+import com.sbz.bookstore.model.facts.UserStatus;
+import java.time.LocalDate;
+
+rule "User is new if he has less than 10 reviews"
+    agenda-group "user-new"
+    when
+        $user: User(reviews.size() < 10)
+        $userStatus: UserStatus()
+    then
+        $userStatus.setIsUserNew(true)
+end
+
+rule "User is NOT new if he has more or equal to 10 reviews"
+    agenda-group "user-new"
+    when
+        $user: User(reviews.size() => 10)
+        $userStatus: UserStatus()
+    then
+        $userStatus.setIsUserNew(false)
+end
