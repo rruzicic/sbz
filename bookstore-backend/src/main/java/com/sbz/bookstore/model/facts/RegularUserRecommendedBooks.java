@@ -2,6 +2,7 @@ package com.sbz.bookstore.model.facts;
 
 import com.sbz.bookstore.model.Book;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RegularUserRecommendedBooks {
