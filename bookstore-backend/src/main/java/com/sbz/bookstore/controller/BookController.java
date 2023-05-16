@@ -32,6 +32,12 @@ public class BookController {
 		return ResponseEntity.ok(bookService.getRecommendedUnauthorized());
 	}
 
+	@GetMapping("/recommend/regular/{userId}")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<List<Book>> recommendToRegular(@PathVariable Long userId){
+		return ResponseEntity.ok(bookService.getRecommendedRegular(userId));
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Book> getById(@PathVariable Long id) {
 		return ResponseEntity.ok(bookService.getById(id));
