@@ -5,11 +5,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.List;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AccessLevel;
@@ -21,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name="bookstore_user")
+@Table(name="bank_user")
 @Entity
 @NoArgsConstructor
 public class User extends BaseEntity {

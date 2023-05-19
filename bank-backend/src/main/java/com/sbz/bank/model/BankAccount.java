@@ -28,13 +28,10 @@ public class BankAccount extends BaseEntity {
 	@JoinColumn(name = "user_id", nullable = false)
 	@JsonBackReference("userBackReference")
 	User owner;
-
 	@Column
 	double balance;
-
 	@Column
 	int cvv;
-
 	@Column
 	Date creditCardExpiryDate;
 }

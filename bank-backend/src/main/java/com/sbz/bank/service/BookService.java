@@ -26,8 +26,6 @@ public class BookService {
 	}
 
 	public Book createBook(Book book) {
-		if (book == null) { return null; }
-		book.setAddedToBookstoreDate(LocalDate.now());
 		return bookRepository.save(book);
 	}
 
