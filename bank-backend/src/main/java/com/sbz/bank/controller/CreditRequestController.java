@@ -34,7 +34,7 @@ public class CreditRequestController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<CreditRequest> createBook(@RequestBody CreditRequest creditRequest) {
+	public ResponseEntity<CreditRequest> createCreditRequest(@RequestBody CreditRequest creditRequest) {
 		return creditRequestService.createCreditRequest(creditRequest) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
 

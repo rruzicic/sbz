@@ -1,12 +1,13 @@
 package com.sbz.bank.service;
 
-import com.sbz.bank.model.BankAccount;
+import com.sbz.bank.config.KieConfig;
 import com.sbz.bank.model.CreditRequest;
-import com.sbz.bank.repository.BankAccountRepository;
 import com.sbz.bank.repository.CreditRequestRepository;
 
 import java.util.List;
 
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,12 @@ public class CreditRequestService {
 	}
 
 	public CreditRequest createCreditRequest(CreditRequest creditRequest) {
-		return creditRequestRepository.save(creditRequest);
+		CreditRequest request = creditRequestRepository.save(creditRequest);
+		KieContainer kieContainer = new KieConfig().kieContainer();
+		KieSession kieSession = kieContainer.newKieSession();
+		kieSession.insert(request);
+
+		return request;
 	}
 
 	public CreditRequest updateCreditRequest(CreditRequest creditRequest) {

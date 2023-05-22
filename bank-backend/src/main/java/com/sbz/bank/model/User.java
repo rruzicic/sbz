@@ -46,6 +46,19 @@ public class User extends BaseEntity {
 	@JsonManagedReference("requestsBackReference")
 	List<CreditRequest> creditRequests;
 
+	@Column
+	@OneToMany(mappedBy = "sender", orphanRemoval = true)
+	@JsonManagedReference("outboundTransactionBackReference")
+	List<Transaction> outboundTransaction;
+
+	@Column
+	@OneToMany(mappedBy = "receiver", orphanRemoval = true)
+	@JsonManagedReference("inboundTransactionBackReference")
+	List<Transaction> inboundTransactions;
+
+	public double getOutboundTransactionsAmountAverage() {
+		return this.getOutboundTransaction().stream().mapToDouble(a -> a.getAmount()).average().getAsDouble();
+	}
 
 	public User(User user) {
 		this.id = user.getId();

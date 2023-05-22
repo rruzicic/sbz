@@ -24,6 +24,8 @@ public class TransactionService {
 	}
 
 	public Transaction createTransaction(Transaction transaction) {
+		//transaction.getSender().getOutboundTransaction().get(0).getLocation().getDistance()
+		boolean c = transaction.getSender().getOutboundTransaction().stream().mapToDouble(a -> a.getAmount()) != null;
 		return transactionRepository.save(transaction);
 	}
 

@@ -34,7 +34,7 @@ public class TransactionController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<Transaction> createBook(@RequestBody Transaction transaction) {
+	public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
 		return transactionService.createTransaction(transaction) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
 

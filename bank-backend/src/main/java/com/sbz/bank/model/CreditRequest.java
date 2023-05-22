@@ -34,10 +34,15 @@ public class CreditRequest extends BaseEntity {
 	@Column
 	int loanTerm;
 	@Column
+	@Enumerated(EnumType.STRING)
+	EmploymentStatus employmentStatus;
+	@Column
 	Date employmentStartDate;
 	@Column
 	Date temporaryContractExpiry;
 	@Column
 	@Enumerated(EnumType.STRING)
-	CreditStatus status;
+	CreditStatus creditStatus;
+	@Column
+	boolean recommendApproval;
 }

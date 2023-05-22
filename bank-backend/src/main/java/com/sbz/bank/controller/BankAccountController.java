@@ -1,15 +1,12 @@
 package com.sbz.bank.controller;
 
 import com.sbz.bank.model.BankAccount;
-import com.sbz.bank.model.Book;
 import com.sbz.bank.service.BankAccountService;
-import com.sbz.bank.service.BookService;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +32,7 @@ public class BankAccountController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<BankAccount> createBook(@RequestBody BankAccount bankAccount) {
+	public ResponseEntity<BankAccount> createBankAccount(@RequestBody BankAccount bankAccount) {
 		return bankAccountService.createBankAccount(bankAccount) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
 
