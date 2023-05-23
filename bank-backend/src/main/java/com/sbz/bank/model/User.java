@@ -57,6 +57,7 @@ public class User extends BaseEntity {
 	List<Transaction> inboundTransactions;
 
 	public double getOutboundTransactionsAmountAverage() {
+		if (this.getOutboundTransaction() == null) return 0;
 		return this.getOutboundTransaction().stream().mapToDouble(a -> a.getAmount()).average().getAsDouble();
 	}
 

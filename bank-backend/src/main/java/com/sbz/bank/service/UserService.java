@@ -29,6 +29,7 @@ public class UserService {
 	public User getById(Long id) {
 		return userRepository.findById(id).get();
 	}
+	public boolean exists(Long id) { return  userRepository.existsById(id); }
 
 	public User registerUser(User user) {
 		user.setRole(Role.USER);

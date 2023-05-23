@@ -2,7 +2,7 @@ package com.sbz.bank.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,5 +33,5 @@ public class BankAccount extends BaseEntity {
 	@Column
 	int cvv;
 	@Column
-	Date creditCardExpiryDate;
+	LocalDateTime creditCardExpiryDate;
 }

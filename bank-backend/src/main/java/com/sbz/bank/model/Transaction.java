@@ -3,14 +3,12 @@ package com.sbz.bank.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
@@ -37,7 +35,7 @@ public class Transaction extends BaseEntity {
 	@Column
 	int cvv;
 	@Column
-	Date expiryDate;
+	LocalDateTime expiryDate;
 	@Column
 	double amount;
 	@Embedded

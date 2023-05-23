@@ -33,7 +33,8 @@ public class BankAccountController {
 
 	@PostMapping("/new")
 	public ResponseEntity<BankAccount> createBankAccount(@RequestBody BankAccount bankAccount) {
-		return bankAccountService.createBankAccount(bankAccount) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+		BankAccount createdBankAccount = bankAccountService.createBankAccount(bankAccount);
+		return createdBankAccount != null ? ResponseEntity.ok(createdBankAccount) : ResponseEntity.badRequest().build();
 	}
 
 	@PostMapping("/update")

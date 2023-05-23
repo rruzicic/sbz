@@ -1,11 +1,14 @@
 package com.sbz.bank.controller;
 
+import com.sbz.bank.dto.TransactionDTO;
 import com.sbz.bank.model.CreditRequest;
 import com.sbz.bank.model.Transaction;
 import com.sbz.bank.service.CreditRequestService;
 import com.sbz.bank.service.TransactionService;
 
 import java.util.List;
+
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +36,10 @@ public class TransactionController {
 		return ResponseEntity.ok(transactionService.getById(id));
 	}
 
-	@PostMapping("/new")
-	public ResponseEntity<Transaction> createTransaction(@RequestBody Transaction transaction) {
-		return transactionService.createTransaction(transaction) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
+	@PostMapping("/submit")
+	public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody TransactionDTO transactionDto) {
+		Transaction createdTransaction = transactionService.createTransaction(transactionDto.transactionDtoToTransaction());
+		return createdTransaction != null ? ResponseEntity.ok(createdTransaction) : ResponseEntity.badRequest().build();
 	}
 
 	@PostMapping("/update")
