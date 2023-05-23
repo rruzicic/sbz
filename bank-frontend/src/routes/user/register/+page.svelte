@@ -1,23 +1,22 @@
 <script>
 	import axios from 'axios';
-	import GenreSelect from '../../../lib/GenreSelect.svelte';
 	import Input from '../../../lib/Input.svelte';
 	import { required, validateEmail, validate } from '../../../lib/util/validate';
 	import { goto } from '$app/navigation';
 	import { toast } from '../../../lib/stores/toast';
 
 	let user = {
-		name: '',
+		firstName: '',
+		lastName: '',
 		email: '',
 		password: '',
-		favouriteGenres: ''
 	};
 
 	let userValidation = {
-		name: [required],
+		firstName: [required],
+		lastName: [required],
 		email: [required, validateEmail],
 		password: [required],
-		favouriteGenres: []
 	};
 
 	$: [userErrOut, valid] = validate(user, userValidation);
@@ -25,7 +24,7 @@
 	function handleSubmit() {
 		axios.post('http://localhost:8081/user/register', user)
 		.then((res) => {
-			handleToast('Yay!', 'You can now buy and review books!')
+			handleToast('Yay!', 'You can now send and receive money!')
 			goto(`/`, true) 
 		})
 		.catch((err) => {
@@ -43,11 +42,10 @@
 
 <h1>Register page</h1>
 <form>
-	<Input label="Name" errors={userErrOut.name} bind:value={user.name} />
+	<Input label="First name" errors={userErrOut.firstName} bind:value={user.firstName} />
+	<Input label="Last name" errors={userErrOut.lastName} bind:value={user.lastName} />
 	<Input label="Email" errors={userErrOut.email} bind:value={user.email} />
 	<Input label="Password" errors={userErrOut.password} bind:value={user.password} />
-	<GenreSelect bind:genre={user.favouriteGenres}/>
-
 
 	<button type="button" class="btn btn-primary" on:click={handleSubmit} disabled={!valid}>
 		Submit
