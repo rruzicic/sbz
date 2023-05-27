@@ -12,14 +12,14 @@ rule "User is new if he has less than 10 reviews"
         $user: User(reviews.size() < 10)
         $userStatus: UserStatus()
     then
-        $userStatus.setIsUserNew(true)
+        $userStatus.setIsUserNew(true);
 end
 
 rule "User is NOT new if he has more or equal to 10 reviews"
     agenda-group "user-new"
     when
-        $user: User(reviews.size() => 10)
+        $user: User(reviews.size() >= 10)
         $userStatus: UserStatus()
     then
-        $userStatus.setIsUserNew(false)
+        $userStatus.setIsUserNew(false);
 end

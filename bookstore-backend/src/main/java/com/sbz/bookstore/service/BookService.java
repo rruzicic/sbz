@@ -72,6 +72,15 @@ public class BookService {
 
 		//TODO Fire rules from the rules engine
 
+		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
+		kieSession.fireAllRules();
+
+		if (!userStatus.getIsUserNew()){
+			System.out.println("----USER IS CHANGED TO NOT NEW----");
+		} else {
+			System.out.println("----USER IS NEW----");
+		}
+
 		return recommendedBooks.getRecommendedBooks();
 	}
 
