@@ -74,12 +74,26 @@ public class BookService {
 
 		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
 		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
+		kieSession.fireAllRules();
 
 		if (!userStatus.getIsUserNew()){
 			System.out.println("----USER IS CHANGED TO NOT NEW----");
 		} else {
 			System.out.println("----USER IS NEW----");
 		}
+
+		if (!userStatus.getHasChosenFavouriteGenres()){
+			System.out.println("----USER HAS NOT CHOSEN FAVOURITE GENRES----");
+		} else {
+			System.out.println("----USER HAS CHOSEN FAVOURITE GENRES----");
+		}
+
+		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
+			return getRecommendedUnauthorized();
+		}
+
+		//ODAVDE SE NASTAVLJAJU DALJA PRAVILA
 
 		return recommendedBooks.getRecommendedBooks();
 	}

@@ -23,3 +23,21 @@ rule "User is NOT new if he has more or equal to 10 reviews"
     then
         $userStatus.setIsUserNew(false);
 end
+
+rule "User did NOT choose his favourite genres"
+    agenda-group "user-choose-genres"
+    when
+        $user: User(favouriteGenres.isEmpty())
+        $userStatus: UserStatus()
+    then
+        $userStatus.setHasChosenFavouriteGenres(false);
+end
+
+rule "User did choose his favourite genres"
+    agenda-group "user-choose-genres"
+    when
+        $user: User(!favouriteGenres.isEmpty())
+        $userStatus: UserStatus()
+    then
+        $userStatus.setHasChosenFavouriteGenres(true);
+end
