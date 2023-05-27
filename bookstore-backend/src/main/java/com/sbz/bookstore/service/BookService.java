@@ -12,6 +12,7 @@ import com.sbz.bookstore.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.kie.api.runtime.KieContainer;
@@ -68,6 +69,7 @@ public class BookService {
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
 		kieSession.insert(recommendedBooks);
 		UserStatus userStatus = new UserStatus();
+		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
@@ -76,7 +78,8 @@ public class BookService {
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
 		kieSession.fireAllRules();
-
+		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
+		kieSession.fireAllRules();
 		if (!userStatus.getIsUserNew()){
 			System.out.println("----USER IS CHANGED TO NOT NEW----");
 		} else {
@@ -123,5 +126,45 @@ public class BookService {
 			return true;
 		}
 		return false;
+	}
+
+	public List<Book> getBooksLikedBySimilarUsers(long userId)
+	{
+		User user = userRepository.findById(userId).get();
+		List<User> allUsers = userRepository.findAll();
+		List<User> similarUsers = new ArrayList<User>();
+		double userAverageRating = user.getAverageRating();
+		for(User u: allUsers){
+			if(u.getId() == user.getId())
+				continue;
+			double sum1 = 0;
+			double sum2 = 0;
+			double sum3 = 0;
+			double uAvgRating = u.getAverageRating();
+			for(Review r: user.getReviews()){
+				double rui = u.getRatingForBook(r.getBook().getId());
+				if(rui == -1)
+					continue;
+				sum1 += (rui - uAvgRating)*(r.getRating() - userAverageRating);
+				sum2 += (rui - uAvgRating)*(rui - uAvgRating);
+				sum3 += (r.getRating() - userAverageRating)*(r.getRating() - userAverageRating);
+			}
+			int a = 0;
+			if(sum2*sum3 == 0)
+				continue;
+			double s = sum1/(Math.sqrt(sum2)*Math.sqrt(sum3));
+			if(sum1/(Math.sqrt(sum2)*Math.sqrt(sum3)) >= 0.5)
+				similarUsers.add(u);
+		}
+		List<Book> booksLikedBySimilarUsers = new ArrayList<>();
+		for(User u: similarUsers)
+		{
+			for(Review r: u.getReviews())
+			{
+				if(r.getRating()>=4 && !booksLikedBySimilarUsers.contains(r.getBook()))
+					booksLikedBySimilarUsers.add(r.getBook());
+			}
+		}
+		return booksLikedBySimilarUsers;
 	}
 }

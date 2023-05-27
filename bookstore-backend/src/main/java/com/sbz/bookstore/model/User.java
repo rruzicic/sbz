@@ -58,4 +58,24 @@ public class User extends BaseEntity {
 		this.favouriteGenres = user.getFavouriteGenres();
 		this.role = user.getRole();
 	}
+
+	public double getAverageRating()
+	{
+		double sum = 0.0;
+		for(Review r: reviews)
+		{
+			sum += r.getRating();
+		}
+		return sum/reviews.size();
+	}
+
+	public double getRatingForBook(long bookId)
+	{
+		for(Review r: reviews)
+		{
+			if(r.getBook().getId() == bookId)
+				return r.getRating();
+		}
+		return -1;
+	}
 }

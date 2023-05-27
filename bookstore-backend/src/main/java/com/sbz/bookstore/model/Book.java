@@ -65,6 +65,10 @@ public class Book extends BaseEntity {
 	@JsonInclude
 	@Transient
 	RatingLevel rating;
+
+	@JsonInclude
+	@Transient
+	int recommendationPoints = 0;
 	@Transient
 	public double getAverageRating() {
 		if (reviews.size() == 0) return 0;
@@ -73,5 +77,10 @@ public class Book extends BaseEntity {
 			ratingSum += review.getRating();
 		}
 		return ratingSum / reviews.size();
+	}
+
+	@Transient
+	public void incrementRecommendationPoints(){
+		recommendationPoints += 1;
 	}
 }
