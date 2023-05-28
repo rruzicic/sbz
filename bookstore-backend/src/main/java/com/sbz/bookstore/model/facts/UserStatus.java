@@ -11,11 +11,13 @@ public class UserStatus {
     private boolean hasChosenFavouriteGenres;
 
     private List<Book> booksLikedBySimilarUsers;
+    private List<Book> tenMostPopularBooksByFourAuthors;
 
     public UserStatus(){
         isUserNew = true;
         hasChosenFavouriteGenres = false;
         booksLikedBySimilarUsers = new ArrayList<Book>();
+        tenMostPopularBooksByFourAuthors = new ArrayList<Book>();
     }
 
     public boolean getIsUserNew(){
@@ -32,4 +34,12 @@ public class UserStatus {
 
     public List<Book> getBooksLikedBySimilarUsers(){return booksLikedBySimilarUsers;}
     public void setBooksLikedBySimilarUsers(List<Book> booksLikedBySimilarUsers) {this.booksLikedBySimilarUsers = booksLikedBySimilarUsers;}
+
+    public List<Book> getTenMostPopularBooksByFourAuthors() {
+        return tenMostPopularBooksByFourAuthors;
+    }
+
+    public void setTenMostPopularBooksByFourAuthors(List<Book> tenMostPopularBooksByFourAuthors) {
+        this.tenMostPopularBooksByFourAuthors = tenMostPopularBooksByFourAuthors;
+    }
 }

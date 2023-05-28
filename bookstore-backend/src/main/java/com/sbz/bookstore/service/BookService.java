@@ -12,8 +12,8 @@ import com.sbz.bookstore.service.UserService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
 
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
@@ -32,6 +32,18 @@ public class BookService {
 
 	public List<Book> getAll() {
 		return bookRepository.findAll();
+	}
+
+	public List<Book> getAllByAuthor(Author author){
+		List<Book> list = new ArrayList<>();
+		List<Book> allBooks = getAll();
+		for (Book book: allBooks) {
+			if (book.getAuthor() == author)
+			{
+				list.add(book);
+			}
+		}
+		return list;
 	}
 
 	public List<Book> getRecommendedUnauthorized() {
@@ -70,6 +82,7 @@ public class BookService {
 		kieSession.insert(recommendedBooks);
 		UserStatus userStatus = new UserStatus();
 		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
+		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
@@ -166,5 +179,83 @@ public class BookService {
 			}
 		}
 		return booksLikedBySimilarUsers;
+	}
+
+	public boolean doesAuthorBelongToGenre(Author author, Genre genre) {
+		int sumAll = 0;
+		List<Book> allBooksByAuthor = getAllByAuthor(author);
+		sumAll = allBooksByAuthor.size();
+		int countSpecificGenre = 0;
+		for (Book book: allBooksByAuthor) {
+			if (book.getGenre() == genre){
+				countSpecificGenre++;
+			}
+		}
+		double genreRatio = (double)countSpecificGenre / (double)sumAll;
+		if (genreRatio >= 30.0/100.0){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+
+	public int getAuthorPopularity(Author author){
+		List<Book> allBooksByAuthor = getAllByAuthor(author);
+		int popularityScore = 0;
+		for (Book book: allBooksByAuthor) {
+			popularityScore += book.getReviews().size();
+		}
+		return popularityScore;
+	}
+
+	public List<Author> sortAuthorsByPopularity(List<Author> eligibleAuthors){
+		Map<Author, Integer> authorPopularityMap = new HashMap<Author, Integer>();
+		for (Author author: eligibleAuthors) {
+			authorPopularityMap.put(author, getAuthorPopularity(author));
+		}
+		List<Entry<Author, Integer>> nlist = new ArrayList<>(authorPopularityMap.entrySet());
+		nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
+
+		List<Author> sortedList = new ArrayList<>();
+		for (Entry<Author, Integer> entry: nlist){
+			sortedList.add(entry.getKey());
+		}
+		return sortedList;
+	}
+
+	public List<Author> getFourMostPopularAuthors(long userId){
+		User user = userRepository.findById(userId).get();
+		List<Author> eligibleAuthors = new ArrayList<>();
+		List<Author> allAuthors = authorRepository.findAll();
+		for (Author author: allAuthors) {
+			for (Genre genre : user.getFavouriteGenres()) {
+				if (doesAuthorBelongToGenre(author, genre)){
+					eligibleAuthors.add(author);
+				}
+			}
+		}
+		List<Author> sortedAuthors = sortAuthorsByPopularity(eligibleAuthors);
+		if (sortedAuthors.size()>=4){
+			return sortedAuthors.subList(0,4);
+		}
+		else{ //just in case there are not even 4 authors in the list
+			return sortedAuthors;
+		}
+	}
+
+	public List<Book> get10MostPopularBooksBy4Authors(long userId){
+		List<Author> fourAuthors = getFourMostPopularAuthors(userId);
+		List<Book> allBooks = new ArrayList<>();
+		for (Author author: fourAuthors){
+			allBooks.addAll(getAllByAuthor(author));
+		}
+		allBooks.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+		if (allBooks.size() >= 10) {
+			return allBooks.subList(0, 10);
+		}
+		else { //Just in case there is not even 10 books in the list.
+			return allBooks;
+		}
 	}
 }

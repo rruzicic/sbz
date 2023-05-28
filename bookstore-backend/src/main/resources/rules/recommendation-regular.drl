@@ -42,10 +42,20 @@ rule "User did choose his favourite genres"
         $userStatus.setHasChosenFavouriteGenres(true);
 end
 
+rule "recommend 10 best books if user chose his favourite genres"
+    agenda-group "recommend-books"
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true)
+        $recommendation: RegularUserRecommendedBooks()
+    then
+        $recommendation.setRecommendedBooks($userStatus.getTenMostPopularBooksByFourAuthors());
+end
+
+
 rule "Book liked by similar user"
     agenda-group "recommend-books"
     when
-        $userStatus: UserStatus()
+        $userStatus: UserStatus(isUserNew == false)
         $book: Book($userStatus.getBooksLikedBySimilarUsers.contains($book))
         $recommendationList: RegularUserRecommendedBooks(!recommendedBooks.contains($book))
     then
