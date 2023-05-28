@@ -54,11 +54,23 @@ end
 
 rule "Book liked by similar user"
     agenda-group "recommend-books"
+    lock-on-active
     when
         $userStatus: UserStatus(isUserNew == false)
         $book: Book($userStatus.getBooksLikedBySimilarUsers.contains($book))
-        $recommendationList: RegularUserRecommendedBooks(!recommendedBooks.contains($book))
+        $recommendationList: RegularUserRecommendedBooks()
     then
-        modify($book){incrementRecommendationPoints();}
-        $recommendationList.addToRecommended($book);
+        modify($recommendationList){addToRecommended($book);}
 end
+rule "Book similar to books user likes"
+    agenda-group "recommend-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus()
+        $book: Book($userStatus.getBooksSimilarToBooksUserLikes.contains($book))
+        $recommendationList: RegularUserRecommendedBooks()
+    then
+         modify($recommendationList){addToRecommended($book);}
+end
+
+

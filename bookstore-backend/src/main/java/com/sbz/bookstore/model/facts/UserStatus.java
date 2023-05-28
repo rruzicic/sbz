@@ -9,15 +9,18 @@ import java.util.List;
 public class UserStatus {
     private boolean isUserNew;
     private boolean hasChosenFavouriteGenres;
-
     private List<Book> booksLikedBySimilarUsers;
     private List<Book> tenMostPopularBooksByFourAuthors;
+    private List<Book> booksSimilarToBooksUserLikes;
+
 
     public UserStatus(){
         isUserNew = true;
         hasChosenFavouriteGenres = false;
         booksLikedBySimilarUsers = new ArrayList<Book>();
         tenMostPopularBooksByFourAuthors = new ArrayList<Book>();
+        booksSimilarToBooksUserLikes = new ArrayList<Book>();
+
     }
 
     public boolean getIsUserNew(){
@@ -42,4 +45,7 @@ public class UserStatus {
     public void setTenMostPopularBooksByFourAuthors(List<Book> tenMostPopularBooksByFourAuthors) {
         this.tenMostPopularBooksByFourAuthors = tenMostPopularBooksByFourAuthors;
     }
+    public List<Book> getBooksSimilarToBooksUserLikes(){return booksSimilarToBooksUserLikes;}
+    public void setBooksSimilarToBooksUserLikes(List<Book> booksSimilarToBooksUserLikes) {this.booksSimilarToBooksUserLikes = booksSimilarToBooksUserLikes;}
+
 }

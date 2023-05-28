@@ -24,6 +24,30 @@ public class RegularUserRecommendedBooks {
     }
 
     public void addToRecommended(Book item) {
+        for(Book b: recommendedBooks)
+        {
+            if(b.getId() == item.getId())
+            {
+                b.incrementRecommendationPoints();
+                return;
+            }
+        }
+        item.incrementRecommendationPoints();
         recommendedBooks.add(item);
+    }
+
+    public void removeBook(Book book)
+    {
+        System.out.println("---------");
+        for(Book b: recommendedBooks)
+        {
+            if(b.getId() == book.getId())
+            {
+                recommendedBooks.remove(b);
+
+                //System.out.println();
+                break;
+            }
+        }
     }
 }

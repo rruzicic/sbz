@@ -2,6 +2,7 @@ package com.sbz.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -77,5 +78,14 @@ public class User extends BaseEntity {
 				return r.getRating();
 		}
 		return -1;
+	}
+
+	public List<Book> getBooksUserLikes(){
+		List<Book> books = new ArrayList<>();
+		for(Review r: reviews){
+			if(r.getRating()>=4)
+				books.add(r.getBook());
+		}
+		return books;
 	}
 }
