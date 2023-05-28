@@ -82,7 +82,11 @@ public class BookService {
 		kieSession.insert(recommendedBooks);
 		UserStatus userStatus = new UserStatus();
 		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
+
 		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
+
+		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
+
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
@@ -105,9 +109,9 @@ public class BookService {
 			System.out.println("----USER HAS CHOSEN FAVOURITE GENRES----");
 		}
 
-		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
+		/*if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();
-		}
+		}*/
 
 		//ODAVDE SE NASTAVLJAJU DALJA PRAVILA
 
@@ -257,5 +261,40 @@ public class BookService {
 		else { //Just in case there is not even 10 books in the list.
 			return allBooks;
 		}
+	}
+
+	public List<Book> getBooksSimilarToBooksUserLikes(long userId){
+		User user = userRepository.findById(userId).get();
+		List<Book> books = bookRepository.findAll();
+		List<Book> similarBooks = new ArrayList<>();
+		for(Book book1: user.getBooksUserLikes())
+		{
+			for(Book book2: books){
+				if(book1.getId() == book2.getId())
+					continue;
+				if(areBooksSimilar(book1, book2) && !similarBooks.contains(book2))
+					similarBooks.add(book2);
+			}
+		}
+		return similarBooks;
+	}
+
+	public boolean areBooksSimilar(Book b1, Book b2)
+	{
+		int numberOfReviewers = 0;
+		int numberOfSameRatings = 0;
+		for(Review r: b1.getReviews()) {
+			double rating = r.getUser().getRatingForBook(b2.getId());
+			if (rating != -1)
+			{
+				numberOfReviewers ++;
+				if(Math.abs(r.getRating() - rating) <= 1)
+					numberOfSameRatings ++;
+			}
+		}
+		if(numberOfReviewers == 0)
+			return false;
+		return (double)numberOfSameRatings/numberOfReviewers > 0.7;
+
 	}
 }
