@@ -51,7 +51,6 @@ rule "recommend 10 best books if user chose his favourite genres"
         $recommendation.setRecommendedBooks($userStatus.getTenMostPopularBooksByFourAuthors());
 end
 
-
 rule "Book liked by similar user"
     agenda-group "recommend-books"
     lock-on-active
@@ -62,15 +61,25 @@ rule "Book liked by similar user"
     then
         modify($recommendationList){addToRecommended($book);}
 end
+
 rule "Book similar to books user likes"
     agenda-group "recommend-books"
     lock-on-active
     when
-        $userStatus: UserStatus()
+        $userStatus: UserStatus(isUserNew == false)
         $book: Book($userStatus.getBooksSimilarToBooksUserLikes.contains($book))
         $recommendationList: RegularUserRecommendedBooks()
     then
          modify($recommendationList){addToRecommended($book);}
 end
 
-
+rule "Recommend books that would be interesting to user"
+    agenda-group "recommend-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false)
+        $book: Book($userStatus.getInterestingBooks.contains($book))
+        $recommendationList: RegularUserRecommendedBooks()
+    then
+         modify($recommendationList){addToRecommended($book);}
+end

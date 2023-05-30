@@ -12,6 +12,7 @@ public class UserStatus {
     private List<Book> booksLikedBySimilarUsers;
     private List<Book> tenMostPopularBooksByFourAuthors;
     private List<Book> booksSimilarToBooksUserLikes;
+    private List<Book> interestingBooks;
 
 
     public UserStatus(){
@@ -20,7 +21,7 @@ public class UserStatus {
         booksLikedBySimilarUsers = new ArrayList<Book>();
         tenMostPopularBooksByFourAuthors = new ArrayList<Book>();
         booksSimilarToBooksUserLikes = new ArrayList<Book>();
-
+        interestingBooks = new ArrayList<Book>();
     }
 
     public boolean getIsUserNew(){
@@ -48,4 +49,11 @@ public class UserStatus {
     public List<Book> getBooksSimilarToBooksUserLikes(){return booksSimilarToBooksUserLikes;}
     public void setBooksSimilarToBooksUserLikes(List<Book> booksSimilarToBooksUserLikes) {this.booksSimilarToBooksUserLikes = booksSimilarToBooksUserLikes;}
 
+    public List<Book> getInterestingBooks() {
+        return interestingBooks;
+    }
+
+    public void setInterestingBooks(List<Book> interestingBooks) {
+        this.interestingBooks = interestingBooks;
+    }
 }

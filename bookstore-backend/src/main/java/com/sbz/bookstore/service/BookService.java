@@ -26,9 +26,10 @@ public class BookService {
 	private BookRepository bookRepository;
 	@Autowired
 	private AuthorRepository authorRepository;
-
 	@Autowired
 	private UserRepository userRepository;
+	@Autowired
+	private OrderService orderService;
 
 	public List<Book> getAll() {
 		return bookRepository.findAll();
@@ -86,6 +87,8 @@ public class BookService {
 		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
 
 		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
+
+		userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
 
@@ -296,5 +299,66 @@ public class BookService {
 			return false;
 		return (double)numberOfSameRatings/numberOfReviewers > 0.7;
 
+	}
+
+	public List<Book> getBoughtBooks(Long userId){
+		List<Order> orders = orderService.getOrdersByUserId(userId);
+		List<Book> books = new ArrayList<>();
+		for (Order order:orders) {
+			books.addAll(orderService.extractBooksFromOrder(order));
+		}
+		return books;
+	}
+
+	public List<Author> getInterestingAuthorsForUser(Long userId){
+		List<Book> books = getBoughtBooks(userId);
+		List<Author> interestingAuthors = new ArrayList<>();
+		int count;
+		for(Author author: authorRepository.findAll()) {
+			count = 0;
+			for (Book book : books) {
+				if(book.getAuthor() == author)
+					count++;
+				if(count >= 3) {
+					interestingAuthors.add(book.getAuthor());
+					break;
+				}
+			}
+		}
+		return interestingAuthors;
+	}
+
+	public List<Genre> getInterestingGenresForUser(Long userId){
+		List<Book> books = getBoughtBooks(userId);
+		List<Genre> interestingGenres = new ArrayList<>();
+		int totalNumOfBooks = books.size();
+		int genreCount = 0;
+		for(Genre genre: Genre.values()) {
+			genreCount = 0;
+			for (Book book : books) {
+				if(book.getGenre() == genre)
+					genreCount++;
+			}
+			if(((float)genreCount / (float)totalNumOfBooks) >= (30.0/100.0)){
+				interestingGenres.add(genre);
+			}
+		}
+		return interestingGenres;
+	}
+
+	public List<Book> getInterestingBooksForUser(Long userId){
+		List<Book> allBooks = bookRepository.findAll();
+		List<Author> interestingAuthors = getInterestingAuthorsForUser(userId);
+		List<Genre> interestingGenres = getInterestingGenresForUser(userId);
+		List<Book> interestingBooks = new ArrayList<>();
+		for(Book book: allBooks){
+			if(interestingAuthors.contains(book.getAuthor())){
+				interestingBooks.add(book);
+			}
+			else if (interestingGenres.contains(book.getGenre())){
+				interestingBooks.add(book);
+			}
+		}
+		return interestingBooks;
 	}
 }

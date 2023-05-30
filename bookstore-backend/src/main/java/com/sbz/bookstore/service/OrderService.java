@@ -1,13 +1,22 @@
 package com.sbz.bookstore.service;
 
 import com.sbz.bookstore.config.KieConfig;
+import com.sbz.bookstore.model.Book;
 import com.sbz.bookstore.model.Item;
 import com.sbz.bookstore.model.Order;
+import com.sbz.bookstore.model.User;
+import com.sbz.bookstore.repository.AuthorRepository;
+import com.sbz.bookstore.repository.BookRepository;
 import com.sbz.bookstore.repository.OrderRepository;
+import com.sbz.bookstore.repository.UserRepository;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class OrderService {
@@ -16,8 +25,41 @@ public class OrderService {
     private OrderRepository orderRepository;
     @Autowired
     private ItemService itemService;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private AuthorRepository authorRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    public List<Order> getAll() {
+        return orderRepository.findAll();
+    }
 
     public Order getById(Long id) { return orderRepository.findById(id).get(); }
+
+    public List<Order> getOrdersByUserId(Long userId){
+        User user = userRepository.findById(userId).get();
+        List<Order> list = new ArrayList<>();
+        List<Order> allOrders = getAll();
+        for(Order order: allOrders){
+            if(userId == order.getUser().getId()){
+                list.add(order);
+            }
+        }
+        return list;
+    }
+
+    public List<Book> extractBooksFromOrder(Order order){
+        List<Book> result = new ArrayList<>();
+        for(Item item:order.getItems()){
+            result.add(item.getBook());
+        }
+        return result;
+    }
+
+
+
 
     public Order createOrder(Order order) {
         // search for rules to apply to the items in the order that was just created
