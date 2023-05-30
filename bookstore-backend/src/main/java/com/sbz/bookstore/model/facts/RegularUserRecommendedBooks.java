@@ -4,15 +4,14 @@ import com.sbz.bookstore.model.Author;
 import com.sbz.bookstore.model.Book;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class RegularUserRecommendedBooks {
     private List<Book> recommendedBooks;
-    private List<Author> fourMostPopularAuthors;
 
     public RegularUserRecommendedBooks(){
         recommendedBooks = new ArrayList<Book>();
-        fourMostPopularAuthors = new ArrayList<Author>();
     }
 
     public List<Book> getRecommendedBooks() {
@@ -50,4 +49,12 @@ public class RegularUserRecommendedBooks {
             }
         }
     }
+
+    public void sortByRecommendationPoints(){
+        recommendedBooks.sort(Comparator.comparingInt(Book::getRecommendationPoints).reversed());
+        if(recommendedBooks.size() > 20)
+            setRecommendedBooks(recommendedBooks.subList(0,20));
+    }
+
+
 }

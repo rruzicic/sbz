@@ -39,6 +39,23 @@ INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, pu
 	VALUES ('Some Book 7', 7, 100, '2022-1-1', '2023-01-01', 'ROMANCE', 250);
 INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
 	VALUES ('Some Book 8', 7, 100, '2022-1-1', '2023-01-01', 'ROMANCE', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 1', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 2', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 3', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 4', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 5', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 6', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 7', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+INSERT INTO book (name, author_id, number_of_copies, added_to_bookstore_date, publish_date, genre, price)
+	VALUES ('Nebitna 8', 6, 100, '2022-1-1', '2023-01-01', 'NOVEL', 250);
+
 
 
 INSERT INTO bookstore_user (name, email, password, role) VALUES ('Petar Petrovic', 'pera@pera.com', '123.Auth', 'ADMIN');

@@ -73,10 +73,13 @@ public class BookService {
 	public List<Book> getRecommendedRegular(Long userId){
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
+
+		resetRecommendationPoints();
 		List<Book> books = getAll();
 		for (Book book: books) {
 			kieSession.insert(book);
 		}
+
 		User regularUser = userRepository.findById(userId).get();
 		kieSession.insert(regularUser);
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
@@ -100,23 +103,12 @@ public class BookService {
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
 		kieSession.fireAllRules();
-		if (!userStatus.getIsUserNew()){
-			System.out.println("----USER IS CHANGED TO NOT NEW----");
-		} else {
-			System.out.println("----USER IS NEW----");
-		}
+		kieSession.getAgenda().getAgendaGroup("final").setFocus();
+		kieSession.fireAllRules();
 
-		if (!userStatus.getHasChosenFavouriteGenres()){
-			System.out.println("----USER HAS NOT CHOSEN FAVOURITE GENRES----");
-		} else {
-			System.out.println("----USER HAS CHOSEN FAVOURITE GENRES----");
-		}
-
-		/*if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
+		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();
-		}*/
-
-		//ODAVDE SE NASTAVLJAJU DALJA PRAVILA
+		}
 
 		return recommendedBooks.getRecommendedBooks();
 	}
@@ -146,6 +138,12 @@ public class BookService {
 			return true;
 		}
 		return false;
+	}
+
+	public void resetRecommendationPoints(){
+		for(Book book: getAll()){
+			book.setRecommendationPoints(0);
+		}
 	}
 
 	public List<Book> getBooksLikedBySimilarUsers(long userId)

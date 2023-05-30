@@ -83,3 +83,12 @@ rule "Recommend books that would be interesting to user"
     then
          modify($recommendationList){addToRecommended($book);}
 end
+
+rule "Sort the list by recommendation points"
+    agenda-group "final"
+    when
+        $userStatus: UserStatus(isUserNew == false)
+        $recommendationList: RegularUserRecommendedBooks()
+    then
+        modify($recommendationList){sortByRecommendationPoints();}
+end
