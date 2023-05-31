@@ -77,7 +77,7 @@ INSERT INTO review (rating, book_id, user_id) VALUES (2, 4, 2);
 
 INSERT INTO review (rating, book_id, user_id) VALUES (5, 2, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 1, 2);
-/*INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
+INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
@@ -146,7 +146,7 @@ INSERT INTO review (rating, book_id, user_id) VALUES (5, 15, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (5, 15, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (5, 15, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (5, 15, 2);
-INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);*/
+INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
 
 
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 3);

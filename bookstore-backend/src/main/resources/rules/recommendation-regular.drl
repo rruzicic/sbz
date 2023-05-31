@@ -8,47 +8,52 @@ import java.time.LocalDate;
 
 rule "User is new if he has less than 10 reviews"
     agenda-group "user-new"
+    lock-on-active
     when
         $user: User(reviews.size() < 10)
         $userStatus: UserStatus()
     then
-        $userStatus.setIsUserNew(true);
+        modify($userStatus) { setIsUserNew(true); }
 end
 
 rule "User is NOT new if he has more or equal to 10 reviews"
     agenda-group "user-new"
+    lock-on-active
     when
         $user: User(reviews.size() >= 10)
         $userStatus: UserStatus()
     then
-        $userStatus.setIsUserNew(false);
+        modify($userStatus) { setIsUserNew(false); }
 end
 
 rule "User did NOT choose his favourite genres"
     agenda-group "user-choose-genres"
+    lock-on-active
     when
         $user: User(favouriteGenres.isEmpty())
         $userStatus: UserStatus()
     then
-        $userStatus.setHasChosenFavouriteGenres(false);
+        modify($userStatus) { setHasChosenFavouriteGenres(false); }
 end
 
 rule "User did choose his favourite genres"
     agenda-group "user-choose-genres"
+    lock-on-active
     when
         $user: User(!favouriteGenres.isEmpty())
         $userStatus: UserStatus()
     then
-        $userStatus.setHasChosenFavouriteGenres(true);
+        modify($userStatus) {setHasChosenFavouriteGenres(true);}
 end
 
 rule "recommend 10 best books if user chose his favourite genres"
     agenda-group "recommend-books"
+    lock-on-active
     when
         $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true)
         $recommendation: RegularUserRecommendedBooks()
     then
-        $recommendation.setRecommendedBooks($userStatus.getTenMostPopularBooksByFourAuthors());
+        modify($recommendation) {setRecommendedBooks($userStatus.getTenMostPopularBooksByFourAuthors());}
 end
 
 rule "Book liked by similar user"
@@ -81,11 +86,12 @@ rule "Recommend books that would be interesting to user"
         $book: Book($userStatus.getInterestingBooks.contains($book))
         $recommendationList: RegularUserRecommendedBooks()
     then
-         modify($recommendationList){addToRecommended($book);}
+        modify($recommendationList){addToRecommended($book);}
 end
 
 rule "Sort the list by recommendation points"
     agenda-group "final"
+    lock-on-active
     when
         $userStatus: UserStatus(isUserNew == false)
         $recommendationList: RegularUserRecommendedBooks()
