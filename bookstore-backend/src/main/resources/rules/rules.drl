@@ -3,6 +3,9 @@ import com.sbz.bookstore.model.Item;
 import com.sbz.bookstore.model.Book;
 import com.sbz.bookstore.model.Genre;
 
+global com.sbz.bookstore.service.ItemService itemService;
+global com.sbz.bookstore.service.OrderService orderService;
+
 rule "Two or more item quantity 10% discount"
     activation-group "item discounts" // so that only one rule out of the group is fired
     salience 0 // so that in the rule stack the biggest discount is first
@@ -48,5 +51,24 @@ rule "5 or more items in order 15% discount"
         $o: Order(items.size() >= 5)
     then
         modify($o){setDiscount($o.getDiscount() + 0.15);}
+
+end
+
+rule "Calculate order price - items lower price"
+    agenda-group "calculate price"
+    salience 0
+    when
+        $o: Order(items.size() > 0, itemService.CalculateOrderItemsPriceWithDiscount(items) < itemService.CalculateOrderItemsPriceWithoutDiscount(items) * (1.0 - discount))
+    then
+        modify($o){setTotal_price(itemService.CalculateOrderItemsPriceWithDiscount($o.getItems()));}
+end
+
+rule "Calculate order price - order lower price"
+    agenda-group "calculate price"
+    salience 0
+    when
+        $o: Order(items.size() > 0, itemService.CalculateOrderItemsPriceWithDiscount(items) > itemService.CalculateOrderItemsPriceWithoutDiscount(items) * (1.0 - discount))
+    then
+        modify($o){setTotal_price(itemService.CalculateOrderItemsPriceWithoutDiscount($o.getItems()) * (1.0 - $o.getDiscount()));}
 
 end

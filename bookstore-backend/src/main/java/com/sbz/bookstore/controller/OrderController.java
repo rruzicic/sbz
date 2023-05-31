@@ -33,7 +33,7 @@ public class OrderController {
     public ResponseEntity<Order> getById(@PathVariable Long id) { return ResponseEntity.ok(orderService.getById(id)); }
 
     @GetMapping("/price/{id}")
-    public ResponseEntity<Double> getOrderPrice(@PathVariable Long id) { return ResponseEntity.ok(orderService.CalculateOrderPrice(id)); }
+    public ResponseEntity<Double> getOrderPrice(@PathVariable Long id) { return ResponseEntity.ok(orderService.CalculateOrderPrice(id).getTotal_price()); }
 
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/new")
@@ -41,10 +41,9 @@ public class OrderController {
         Long userId = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
         order.setUser(userService.getById(userId));
         Order createdOrder = orderService.createOrder(order);
-        double price = orderService.CalculateOrderPrice(createdOrder.getId());
         OrderDTO orderDTO = new OrderDTO();
         orderDTO.setOrder(createdOrder);
-        orderDTO.setTotalPrice(price);
+        orderDTO.setTotalPrice(createdOrder.getTotal_price());
         return ResponseEntity.ok(orderDTO);
     }
 

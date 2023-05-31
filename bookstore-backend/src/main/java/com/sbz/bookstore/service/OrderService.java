@@ -40,16 +40,14 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public Double CalculateOrderPrice(Long id) {
-        Order order = getById(id);
+    public Order CalculateOrderPrice(Long id) {
+        KieContainer kieContainer = new KieConfig().kieContainer();
+        KieSession kieSession = kieContainer.newKieSession();
 
-        // Returns the price of the order based on whether the items' price with their discount is lower than the items' price with the order discount
-        double itemsPriceWithDiscount = itemService.CalculateOrderItemsPriceWithDiscount(order.getItems());
-        double itemsPriceWithoutDiscount = itemService.CalculateOrderItemsPriceWithoutDiscount(order.getItems());
+        kieSession.getAgenda().getAgendaGroup("calculate price").setFocus();
+        kieSession.fireAllRules();
 
-        if (itemsPriceWithDiscount < itemsPriceWithoutDiscount * (1.0 - order.getDiscount())) { return itemsPriceWithDiscount; }
-
-        return itemsPriceWithoutDiscount * (1.0 - order.getDiscount());
+        return getById(id);
     }
 
     public boolean deleteOrder(Long id) {
