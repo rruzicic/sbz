@@ -80,7 +80,12 @@ public class Book extends BaseEntity {
 	}
 
 	@Transient
-	public void incrementRecommendationPoints(){
-		recommendationPoints += 1;
+	public void incrementRecommendationPoints(int inc){
+		recommendationPoints += inc;
+	}
+
+	public boolean isBookNew()
+	{
+		return LocalDate.now().plusMonths(-1).compareTo(addedToBookstoreDate) < 0 || LocalDate.now().plusMonths(-6).compareTo(publishDate) < 0 ;
 	}
 }

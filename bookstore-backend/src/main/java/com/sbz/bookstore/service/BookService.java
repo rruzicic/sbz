@@ -167,10 +167,8 @@ public class BookService {
 				sum2 += (rui - uAvgRating)*(rui - uAvgRating);
 				sum3 += (r.getRating() - userAverageRating)*(r.getRating() - userAverageRating);
 			}
-			int a = 0;
 			if(sum2*sum3 == 0)
 				continue;
-			double s = sum1/(Math.sqrt(sum2)*Math.sqrt(sum3));
 			if(sum1/(Math.sqrt(sum2)*Math.sqrt(sum3)) >= 0.5)
 				similarUsers.add(u);
 		}

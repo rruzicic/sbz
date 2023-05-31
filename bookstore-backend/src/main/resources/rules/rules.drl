@@ -2,6 +2,7 @@ import com.sbz.bookstore.model.Order;
 import com.sbz.bookstore.model.Item;
 import com.sbz.bookstore.model.Book;
 import com.sbz.bookstore.model.Genre;
+import com.sbz.bookstore.model.facts.FinalDiscount;
 
 rule "Two or more item quantity 10% discount"
     activation-group "item discounts" // so that only one rule out of the group is fired
@@ -49,4 +50,25 @@ rule "5 or more items in order 15% discount"
     then
         modify($o){setDiscount($o.getDiscount() + 0.15);}
 
+end
+
+rule "order discount is bigger than item discount"
+    activation-group "final discount"
+    when
+        $finalDiscount: FinalDiscount()
+        $order: Order(calculateOrderItemsPriceWithDiscount() < calculateOrderItemsPriceWithoutDiscount() * (1.0 - discount))
+    then
+        modify($finalDiscount){setFinalPrice($order.calculateOrderItemsPriceWithDiscount())}
+        System.out.println("rule1");
+end
+
+rule "item discount is bigger than order discount"
+    activation-group "final discount"
+    lock-on-active
+    when
+        $finalDiscount: FinalDiscount()
+        $order: Order(calculateOrderItemsPriceWithDiscount() >= calculateOrderItemsPriceWithoutDiscount() * (1.0 - discount))
+    then
+        modify($finalDiscount){setFinalPrice($order.calculateOrderItemsPriceWithoutDiscount()*(1-$order.getDiscount()))}
+        System.out.println("rule2");
 end

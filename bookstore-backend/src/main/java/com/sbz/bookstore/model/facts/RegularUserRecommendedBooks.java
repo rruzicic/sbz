@@ -27,28 +27,16 @@ public class RegularUserRecommendedBooks {
         {
             if(b.getId() == item.getId())
             {
-                b.incrementRecommendationPoints();
+                b.incrementRecommendationPoints(2);
                 return;
             }
         }
-        item.incrementRecommendationPoints();
+        item.incrementRecommendationPoints(2);
+        if(item.isBookNew())
+            item.incrementRecommendationPoints(1);
         recommendedBooks.add(item);
     }
 
-    public void removeBook(Book book)
-    {
-        System.out.println("---------");
-        for(Book b: recommendedBooks)
-        {
-            if(b.getId() == book.getId())
-            {
-                recommendedBooks.remove(b);
-
-                //System.out.println();
-                break;
-            }
-        }
-    }
 
     public void sortByRecommendationPoints(){
         recommendedBooks.sort(Comparator.comparingInt(Book::getRecommendationPoints).reversed());
