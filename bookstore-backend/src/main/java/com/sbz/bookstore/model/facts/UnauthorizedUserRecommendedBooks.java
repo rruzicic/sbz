@@ -29,11 +29,7 @@ public class UnauthorizedUserRecommendedBooks {
 	}
 
 	public void removeBadBooks() {
-		for (Book book : recommendedBooks) {
-			if (book.getRating() == RatingLevel.BAD) {
-				recommendedBooks.remove(book);
-			}
-		}
+		recommendedBooks.removeIf(book -> (book.getRating() == RatingLevel.BAD));
 	}
 
 	public void pickTenRandomBooks() {
