@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieRuntime;
 import org.kie.api.runtime.KieSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,10 +36,14 @@ public class TransactionService {
 	public Transaction createTransaction(Transaction transaction) {
 		if(!isTransactionValid(transaction)) return null;
 		transaction.setTimeOfTransaction(LocalDateTime.now());
-		Transaction savedTransaction = transactionRepository.save(transaction);
+		//Transaction savedTransaction = transactionRepository.save(transaction);
+		transaction.setSender(userService.getById(transaction.getSender().getId()));
+		transaction.setReceiver(userService.getById(transaction.getReceiver().getId()));
+		//System.out.println(transaction.getSender().getOutboundTransaction());
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
-		kieSession.insert(savedTransaction);
+		kieSession.setGlobal("userService", userService);
+		kieSession.insert(transaction);
 		kieSession.fireAllRules();
 		return transactionRepository.save(transaction);
 	}
@@ -71,7 +76,7 @@ public class TransactionService {
 	private BankAccount getSenderAccountWithMatchingCvv(Transaction transaction, User sender) {
 		return sender.getAccounts().stream().filter(bankAccount ->
 			bankAccount.getCvv() == transaction.getCvv() &&
-				bankAccount.getBalance() >= transaction.getAmount()).findFirst().get();
+				bankAccount.getBalance() >= transaction.getAmount()).findFirst().orElse(null);
 	}
 
 	private boolean updateBalances(User receiver, User sender, double transactionAmount, BankAccount senderAccount) {

@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -15,6 +16,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -23,12 +25,13 @@ import lombok.experimental.FieldDefaults;
 @Table
 @Entity
 @NoArgsConstructor
+@ToString(callSuper = true)
 public class Transaction extends BaseEntity {
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "sender_id", nullable = false)
 	@JsonBackReference("outboundTransactionBackReference")
 	User sender;
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "receiver_id", nullable = false)
 	@JsonBackReference("inboundTransactionBackReference")
 	User receiver;

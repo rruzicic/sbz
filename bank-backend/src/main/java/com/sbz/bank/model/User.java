@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -22,6 +23,7 @@ import lombok.experimental.FieldDefaults;
 @Table(name="bank_user")
 @Entity
 @NoArgsConstructor
+//@ToString(callSuper = true)
 public class User extends BaseEntity {
 	@Column
 	String email;
@@ -57,7 +59,7 @@ public class User extends BaseEntity {
 	List<Transaction> inboundTransactions;
 
 	public double getOutboundTransactionsAmountAverage() {
-		if (this.getOutboundTransaction() == null) return 0;
+		if (this.getOutboundTransaction() == null || this.getOutboundTransaction().size() == 0) return 0;
 		return this.getOutboundTransaction().stream().mapToDouble(a -> a.getAmount()).average().getAsDouble();
 	}
 

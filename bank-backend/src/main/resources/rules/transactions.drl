@@ -3,32 +3,30 @@ import com.sbz.bank.model.User;
 import java.time.LocalDateTime;
 import java.util.List;
 
-// If the last transaction was made within the last hour and it's location is more than 100km away
-// If the distance between the current transaction and the all other transaction locations is more than 300km
-// If the time of transaction is between 1 am and 5 am and the amount is more than 500
-// If the transaction amount is 3 times larger than the average transaction amount
-// If the last 3 transactions were made within an hour
+global com.sbz.bank.service.UserService userService;
 
 rule "If the last transaction was made within the last hour and it's location is more than 100km away"
-	//agenda-group ""
 	when
 		$transaction: Transaction(
+			sender != null,
 			sender.getOutboundTransaction() != null,
 			sender.getOutboundTransaction().size() >= 1,
 			timeOfTransaction.minusHours(1).isBefore(sender.getOutboundTransaction().get(sender.getOutboundTransaction().size() - 1).getTimeOfTransaction()),
 			sender.getOutboundTransaction().get(sender.getOutboundTransaction().size() - 1).getLocation().getDistance(location) > 100
 			)
 	then
+		System.out.println("Transaction is fraudulent because it was made within the last hour and more than 100km away");
 		modify($transaction){ setFraudulent(true); }
 end
 
 rule "If the distance between the current transaction and the all other transaction locations is more than 300km"
 	//agenda-group ""
 	when
-		$transaction: Transaction(sender.getOutboundTransaction() != null)
-		forall($temp: Transaction(location.getDistance($transaction.location) > 300) from $transaction.sender.getOutboundTransaction())
+		transaction: Transaction(sender.getOutboundTransaction() != null, sender.getOutboundTransaction().size() >= 1)
+		forall($temp: Transaction(location.getDistance(transaction.location) > 300) from transaction.sender.getOutboundTransaction())
 	then
-		modify($transaction){ setFraudulent(true); }
+		System.out.println("Transaction is fraudulent because it was further than 300km from all other transactions");
+		modify(transaction){ setFraudulent(true); }
 end
 
 rule "If the time of transaction is between 1 am and 5 am and the amount is more than 500"
@@ -40,6 +38,7 @@ rule "If the time of transaction is between 1 am and 5 am and the amount is more
 			amount >= 500
 			)
 	then
+		System.out.println("Transaction is fraudulent because it was between 1 am and 5 am and the amount was more than 500");
 		modify($transaction){ setFraudulent(true); }
 end
 
@@ -48,6 +47,7 @@ rule "If the transaction amount is 3 times larger than the average transaction a
 	when
 		$transaction: Transaction(sender.getOutboundTransactionsAmountAverage() != 0, sender.getOutboundTransactionsAmountAverage() * 3 <= amount)
 	then
+		System.out.println("Transaction is fraudulent because the amount was three times the average amount");
 		modify($transaction){ setFraudulent(true); }
 end
 
@@ -62,5 +62,6 @@ rule "If the last 3 transactions were made within an hour"
 			timeOfTransaction.minusHours(1).isBefore(sender.getOutboundTransaction().get(sender.getOutboundTransaction().size() - 3).getTimeOfTransaction())
 			)
 	then
+	System.out.println("Transaction is fraudulent because the last 3 transactions were made within an hour");
 		modify($transaction){ setFraudulent(true); }
 end
