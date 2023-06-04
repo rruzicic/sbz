@@ -27,4 +27,22 @@ public class Order extends BaseEntity{
 	@OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference("orderBackReference")
 	List<Item> items;
+
+	public double calculateOrderItemsPriceWithoutDiscount() {
+		double sum = 0;
+		for (Item item: items) {
+			sum += item.calculateItemPriceWithoutDiscount();
+		}
+
+		return sum;
+	}
+
+	public double calculateOrderItemsPriceWithDiscount() {
+		double sum = 0;
+		for (Item item: items) {
+			sum += item.calculateItemPriceWithDiscount();
+		}
+
+		return sum;
+	}
 }

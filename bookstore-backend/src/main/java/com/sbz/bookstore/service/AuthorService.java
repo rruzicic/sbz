@@ -2,6 +2,7 @@ package com.sbz.bookstore.service;
 
 import com.sbz.bookstore.model.Author;
 import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.Genre;
 import com.sbz.bookstore.repository.AuthorRepository;
 import com.sbz.bookstore.repository.BookRepository;
 
@@ -38,4 +39,6 @@ public class AuthorService {
 		}
 		return false;
 	}
+
+
 }

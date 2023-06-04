@@ -65,6 +65,10 @@ public class Book extends BaseEntity {
 	@JsonInclude
 	@Transient
 	RatingLevel rating;
+
+	@JsonInclude
+	@Transient
+	int recommendationPoints = 0;
 	@Transient
 	public double getAverageRating() {
 		if (reviews.size() == 0) return 0;
@@ -73,5 +77,15 @@ public class Book extends BaseEntity {
 			ratingSum += review.getRating();
 		}
 		return ratingSum / reviews.size();
+	}
+
+	@Transient
+	public void incrementRecommendationPoints(int inc){
+		recommendationPoints += inc;
+	}
+
+	public boolean isBookNew()
+	{
+		return LocalDate.now().plusMonths(-1).compareTo(addedToBookstoreDate) < 0 || LocalDate.now().plusMonths(-6).compareTo(publishDate) < 0 ;
 	}
 }

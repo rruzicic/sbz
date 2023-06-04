@@ -28,4 +28,12 @@ public class Item extends BaseEntity{
 
 	@Column
 	int quantity;
+
+	public double calculateItemPriceWithDiscount() {
+		return book.getPrice() * quantity * (1.0 - discount);
+	}
+
+	public Double calculateItemPriceWithoutDiscount() {
+		return book.getPrice() * quantity;
+	}
 }

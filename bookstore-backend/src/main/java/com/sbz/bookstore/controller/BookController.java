@@ -1,6 +1,7 @@
 package com.sbz.bookstore.controller;
 
 import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.CustomUserDetails;
 import com.sbz.bookstore.service.BookService;
 
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +32,13 @@ public class BookController {
 	@GetMapping("/recommend/unauth")
 	public ResponseEntity<List<Book>> recommendToUnauthorized() {
 		return ResponseEntity.ok(bookService.getRecommendedUnauthorized());
+	}
+
+	@GetMapping("/recommend/regular")
+	@PreAuthorize("hasRole('USER')")
+	public ResponseEntity<List<Book>> recommendToRegular(){
+		Long userId = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+		return ResponseEntity.ok(bookService.getRecommendedRegular(userId));
 	}
 
 	@GetMapping("/{id}")

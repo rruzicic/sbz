@@ -71,36 +71,40 @@ end
 
 rule "Recommend popular and good or neutral book"
 	agenda-group "recommendation"
+	lock-on-active
 	when
 		$book: Book(popular, getRating == RatingLevel.NEUTRAL || getRating == RatingLevel.GOOD)
 		$recommendationList: UnauthorizedUserRecommendedBooks(!recommendedBooks.contains($book))
 	then
-		$recommendationList.addToRecommended($book);
+		modify($recommendationList){ addToRecommended($book); }
 end
 
 rule "Recommend new"
 	agenda-group "recommendation"
+	lock-on-active
 	when
 		$book: Book(new_)
 		$recommendationList: UnauthorizedUserRecommendedBooks(!recommendedBooks.contains($book))
 	then
-		$recommendationList.addToRecommended($book);
+		modify($recommendationList){ addToRecommended($book); }
 end
 
 rule "Remove badly rated books if there are more than 10"
 	agenda-group "remove"
+	lock-on-active
 	salience 0
 	when
-		$recommendationList: UnauthorizedUserRecommendedBooks(recommendedBooks.size() > 10)
+		$recommendationList: UnauthorizedUserRecommendedBooks()
 	then
-		$recommendationList.removeBadBooks();
+		modify($recommendationList){ removeBadBooks(); }
 end
 
 rule "Pick 10 random books"
 	agenda-group "remove"
+	lock-on-active
 	salience -1
 	when
-		$recommendationList: UnauthorizedUserRecommendedBooks(recommendedBooks.size() > 10)
+		$recommendationList: UnauthorizedUserRecommendedBooks()
 	then
-		$recommendationList.pickTenRandomBooks();
+		modify($recommendationList){ pickTenRandomBooks(); }
 end

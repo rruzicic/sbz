@@ -2,6 +2,7 @@ package com.sbz.bookstore.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -57,5 +58,34 @@ public class User extends BaseEntity {
 		this.reviews = user.getReviews();
 		this.favouriteGenres = user.getFavouriteGenres();
 		this.role = user.getRole();
+	}
+
+	public double getAverageRating()
+	{
+		double sum = 0.0;
+		for(Review r: reviews)
+		{
+			sum += r.getRating();
+		}
+		return sum/reviews.size();
+	}
+
+	public double getRatingForBook(long bookId)
+	{
+		for(Review r: reviews)
+		{
+			if(r.getBook().getId() == bookId)
+				return r.getRating();
+		}
+		return -1;
+	}
+
+	public List<Book> getBooksUserLikes(){
+		List<Book> books = new ArrayList<>();
+		for(Review r: reviews){
+			if(r.getRating()>=4)
+				books.add(r.getBook());
+		}
+		return books;
 	}
 }
