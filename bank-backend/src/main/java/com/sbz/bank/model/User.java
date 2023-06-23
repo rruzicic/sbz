@@ -44,7 +44,7 @@ public class User extends BaseEntity {
 	List<BankAccount> accounts;
 
 	@Column
-	@OneToMany(mappedBy = "submitter", orphanRemoval = true)
+	@OneToMany(mappedBy = "client", orphanRemoval = true)
 	@JsonManagedReference("requestsBackReference")
 	List<CreditRequest> creditRequests;
 
