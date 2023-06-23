@@ -3,14 +3,25 @@ import com.sbz.bank.model.CreditRequest;
 
 rule "Say hi when a new credit req comes up"
     when
-        oldClientLongCredit()
+        shouldApproveCredit()
     then
         System.out.println("Credit request will be modified");
+end
+
+query shouldApproveCredit()
+    oldClientLongCredit()
 end
 
 query oldClientLongCredit()
     not CreditRequest(
         client.age >= 60,
         rateNumber >= 120
+    )
+    and clientHasStableEarnings()
+end
+
+query clientHasStableEarnings()
+    CreditRequest(
+        clientEmploymentStatus != EmploymentStatus.UNEMPLOYED
     )
 end
