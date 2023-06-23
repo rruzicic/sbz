@@ -12,10 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -24,11 +21,12 @@ import lombok.experimental.FieldDefaults;
 @Table
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class CreditRequest extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "client_id", nullable = false)
 	@JsonBackReference("requestsBackReference")
-	User submitter;
+	User client;
 
 	@Column(name = "money_sum", nullable = false)
 	double moneySum;

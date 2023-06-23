@@ -1,12 +1,16 @@
 package com.sbz.bank.controller;
 
+import com.sbz.bank.dto.CreditRequestDTO;
 import com.sbz.bank.model.BankAccount;
 import com.sbz.bank.model.CreditRequest;
+import com.sbz.bank.model.CreditStatus;
+import com.sbz.bank.model.User;
 import com.sbz.bank.service.BankAccountService;
 import com.sbz.bank.service.CreditRequestService;
 
 import java.util.List;
 
+import com.sbz.bank.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,6 +26,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CreditRequestController {
 	@Autowired
 	private CreditRequestService creditRequestService;
+	@Autowired
+	private UserService userService;
 
 	@GetMapping("/all")
 	public ResponseEntity<List<CreditRequest>> getAll() {
@@ -34,7 +40,19 @@ public class CreditRequestController {
 	}
 
 	@PostMapping("/new")
-	public ResponseEntity<CreditRequest> createCreditRequest(@RequestBody CreditRequest creditRequest) {
+	public ResponseEntity<CreditRequest> createCreditRequest(@RequestBody CreditRequestDTO creditRequestDTO) {
+		User user = userService.getById(creditRequestDTO.getClientId());
+		CreditRequest creditRequest = new CreditRequest(
+				user,
+				creditRequestDTO.getMoneySum(),
+				creditRequestDTO.getRateNumber(),
+				creditRequestDTO.getClientEmploymentStatus(),
+				creditRequestDTO.getClientContractStart(),
+				creditRequestDTO.getClientContractEnd(),
+				CreditStatus.PENDING,
+				false
+		);
+
 		return creditRequestService.createCreditRequest(creditRequest) != null ? ResponseEntity.ok().build() : ResponseEntity.badRequest().build();
 	}
 
