@@ -9,6 +9,7 @@ import java.util.List;
 function double calculateSumBalance(List bankAccounts) {
     List<BankAccount> bankAccountsTyped = (List<BankAccount>) bankAccounts;
     double sum = 0.0;
+    
     for(BankAccount bankAccount : bankAccountsTyped) {
         sum += bankAccount.getBalance();
     }
@@ -16,11 +17,28 @@ function double calculateSumBalance(List bankAccounts) {
     return sum;
 }
 
+function double calculateCreditMonthlyPayment(double creditAmount, int rateNumber) {
+    return creditAmount / rateNumber;
+}
+
+function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests) {
+    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
+    double sum = 0.0;
+
+    for(CreditRequest creditRequest : creditRequests) {
+        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED) {
+            sum += calculateCreditMonthlyPayment(creditRequest.getMoneySum(), creditRequest.getRateNumber());
+        }
+    }
+
+    return sum;
+}
+
 rule "Say hi when a new credit req comes up"
     when
-        clientHasEnoughAssets()
+        shouldApproveCredit()
     then
-        System.out.println("Crediiit");
+        System.out.println("CREDIIIT");
 end
 
 query shouldApproveCredit()
@@ -45,5 +63,12 @@ end
 query clientHasEnoughAssets()
     CreditRequest(
         calculateSumBalance(client.accounts) > moneySum
+    ) and clientHasGoodDTI()
+end
+
+// see if client has above 36% DTI to take on a new loan
+query clientHasGoodDTI()
+    CreditRequest(
+        clientIncome >= 1.36 * (calculateCurrentMonthlyDebtForClient(client.creditRequests) + calculateCreditMonthlyPayment(moneySum, rateNumber))
     )
 end

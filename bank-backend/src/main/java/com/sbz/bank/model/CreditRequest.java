@@ -28,6 +28,9 @@ public class CreditRequest extends BaseEntity {
 	@JsonBackReference("requestsBackReference")
 	User client;
 
+	@Column(name = "client_income", nullable = false)
+	double clientIncome;
+
 	@Column(name = "money_sum", nullable = false)
 	double moneySum;
 

@@ -44,6 +44,7 @@ public class CreditRequestController {
 		User user = userService.getById(creditRequestDTO.getClientId());
 		CreditRequest creditRequest = new CreditRequest(
 				user,
+				creditRequestDTO.getClientIncome(),
 				creditRequestDTO.getMoneySum(),
 				creditRequestDTO.getRateNumber(),
 				creditRequestDTO.getClientEmploymentStatus(),

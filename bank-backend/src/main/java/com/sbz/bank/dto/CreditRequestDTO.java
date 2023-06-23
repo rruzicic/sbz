@@ -15,6 +15,8 @@ import java.util.Date;
 public class CreditRequestDTO {
     Long clientId;
 
+    double clientIncome;
+
     double moneySum;
 
     int rateNumber;
