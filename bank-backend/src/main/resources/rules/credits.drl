@@ -1,11 +1,26 @@
-import com.sbz.bank.model.User;
-import com.sbz.bank.model.CreditRequest;
+import com.sbz.bank.model.*;
+import java.util.List;
+
+// resources:
+// project specification
+// https://www.forbes.com/advisor/personal-loans/personal-loan-requirements/
+// https://www.investopedia.com/financial-edge/0411/5-things-you-need-to-be-pre-approved-for-a-mortgage.aspx
+
+function double calculateSumBalance(List bankAccounts) {
+    List<BankAccount> bankAccountsTyped = (List<BankAccount>) bankAccounts;
+    double sum = 0.0;
+    for(BankAccount bankAccount : bankAccountsTyped) {
+        sum += bankAccount.getBalance();
+    }
+
+    return sum;
+}
 
 rule "Say hi when a new credit req comes up"
     when
-        shouldApproveCredit()
+        clientHasEnoughAssets()
     then
-        System.out.println("Credit request will be modified");
+        System.out.println("Crediiit");
 end
 
 query shouldApproveCredit()
@@ -23,5 +38,12 @@ end
 query clientHasStableEarnings()
     CreditRequest(
         clientEmploymentStatus != EmploymentStatus.UNEMPLOYED
+    ) and clientHasEnoughAssets()
+end
+
+// since we don't have assets per se, we will use current balance on all accounts
+query clientHasEnoughAssets()
+    CreditRequest(
+        calculateSumBalance(client.accounts) > moneySum
     )
 end

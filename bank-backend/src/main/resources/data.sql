@@ -3,4 +3,5 @@ INSERT INTO bank_user (first_name, last_name, email, password, role, age) VALUES
 INSERT INTO bank_user (first_name, last_name, email, password, role, age) VALUES ('Milan', 'Milanic', 'milan@milanic.com', '123.Auth', 'USER', 45);
 
 INSERT INTO bank_account (balance, credit_card_expiry_date, cvv, user_id) VALUES (500, '2025-1-1', 100, 2);
+INSERT INTO bank_account (balance, credit_card_expiry_date, cvv, user_id) VALUES (500, '2025-1-1', 100, 2);
 INSERT INTO bank_account (balance, credit_card_expiry_date, cvv, user_id) VALUES (700, '2026-1-1', 100, 3);
