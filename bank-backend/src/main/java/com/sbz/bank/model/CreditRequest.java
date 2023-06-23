@@ -26,23 +26,30 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 public class CreditRequest extends BaseEntity {
 	@ManyToOne
-	@JoinColumn(name = "submitter_id", nullable = false)
+	@JoinColumn(name = "client_id", nullable = false)
 	@JsonBackReference("requestsBackReference")
 	User submitter;
-	@Column
-	double amount;
-	@Column
-	int loanTerm;
-	@Column
+
+	@Column(name = "money_sum", nullable = false)
+	double moneySum;
+
+	@Column(name = "rate_number", nullable = false)
+	int rateNumber;
+
+	@Column(name = "client_employment_status", nullable = false)
 	@Enumerated(EnumType.STRING)
-	EmploymentStatus employmentStatus;
-	@Column
-	Date employmentStartDate;
-	@Column
-	Date temporaryContractExpiry;
+	EmploymentStatus clientEmploymentStatus;
+
+	@Column(name = "client_contract_start", nullable = true)
+	Date clientContractStart;
+
+	@Column(name = "client_contract_end", nullable = true)
+	Date clientContractEnd;
+
 	@Column
 	@Enumerated(EnumType.STRING)
 	CreditStatus creditStatus;
+
 	@Column
 	boolean recommendApproval;
 }
