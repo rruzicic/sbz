@@ -29,6 +29,7 @@ public class CreditRequestService {
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
 		kieSession.insert(request);
+		kieSession.fireAllRules();
 
 		return request;
 	}

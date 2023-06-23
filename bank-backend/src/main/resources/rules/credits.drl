@@ -1,0 +1,9 @@
+import com.sbz.bank.model.User;
+import com.sbz.bank.model.CreditRequest;
+
+rule "Say hi when a new credit req comes up"
+    when
+        CreditRequest()
+    then
+        System.out.println("New credit request");
+end
