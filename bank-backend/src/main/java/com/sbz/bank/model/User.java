@@ -39,6 +39,9 @@ public class User extends BaseEntity {
 	Role role;
 
 	@Column
+	int age;
+
+	@Column
 	@OneToMany(mappedBy = "owner", orphanRemoval = true)
 	@JsonManagedReference("userBackReference")
 	List<BankAccount> accounts;
