@@ -28,4 +28,8 @@ public class CreditRequestDTO {
 
     @Nullable
     Date clientContractEnd;
+
+    Date creditEndMin;
+
+    Date creditEndMax;
 }

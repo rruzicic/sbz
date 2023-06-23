@@ -47,6 +47,12 @@ public class CreditRequest extends BaseEntity {
 	@Column(name = "client_contract_end", nullable = true)
 	Date clientContractEnd;
 
+	@Column(name = "credit_end_min", nullable = false)
+	Date creditEndMin;
+
+	@Column(name = "credit_end_max", nullable = false)
+	Date creditEndMax;
+
 	@Column
 	@Enumerated(EnumType.STRING)
 	CreditStatus creditStatus;

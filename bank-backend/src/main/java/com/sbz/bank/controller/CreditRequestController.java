@@ -50,6 +50,8 @@ public class CreditRequestController {
 				creditRequestDTO.getClientEmploymentStatus(),
 				creditRequestDTO.getClientContractStart(),
 				creditRequestDTO.getClientContractEnd(),
+				creditRequestDTO.getCreditEndMin(),
+				creditRequestDTO.getCreditEndMax(),
 				CreditStatus.PENDING,
 				false
 		);
