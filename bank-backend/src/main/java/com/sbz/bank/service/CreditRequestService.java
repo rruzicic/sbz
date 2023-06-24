@@ -25,12 +25,12 @@ public class CreditRequestService {
 	}
 
 	public CreditRequest createCreditRequest(CreditRequest creditRequest) {
-		CreditRequest request = creditRequestRepository.save(creditRequest);
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
-		kieSession.insert(request);
+		kieSession.insert(creditRequest);
+		kieSession.fireAllRules();
 
-		return request;
+		return creditRequestRepository.save(creditRequest);
 	}
 
 	public CreditRequest updateCreditRequest(CreditRequest creditRequest) {
