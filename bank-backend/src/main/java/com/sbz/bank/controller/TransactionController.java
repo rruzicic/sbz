@@ -2,7 +2,9 @@ package com.sbz.bank.controller;
 
 import com.sbz.bank.dto.TransactionDTO;
 import com.sbz.bank.model.CreditRequest;
+import com.sbz.bank.model.CustomUserDetails;
 import com.sbz.bank.model.Transaction;
+import com.sbz.bank.model.User;
 import com.sbz.bank.service.CreditRequestService;
 import com.sbz.bank.service.TransactionService;
 
@@ -12,6 +14,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +42,9 @@ public class TransactionController {
 	@PostMapping("/submit")
 	public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody TransactionDTO transactionDto) {
 		Transaction createdTransaction = transactionService.createTransaction(transactionDto.transactionDtoToTransaction());
+		User sender = new User();
+		sender.setId(((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
+		createdTransaction.setSender(sender);
 		return createdTransaction != null ? ResponseEntity.ok(createdTransaction) : ResponseEntity.badRequest().build();
 	}
 

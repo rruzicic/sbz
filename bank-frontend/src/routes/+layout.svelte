@@ -46,6 +46,9 @@
 				<li class="nav-item">
 					<a class="nav-link" href="/bank-account/new">New bank account</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/transaction/new">New transaction</a>
+				</li>
 				{/if}
 
 				<!-- RENDER FOR UNAUTHENTICATED -->
