@@ -1,0 +1,10 @@
+import com.sbz.bank.model.CreditRequest;
+import com.sbz.bank.model.User;
+import com.sbz.bank.model.EmploymentStatus;
+import com.sbz.bank.model.CreditStatus;
+import java.util.Date;
+
+// Credit is not recommended if the submitter has a bad reputation
+// Credit is not recommended if the submitter is of retirement age
+// Submitter has a bad reputation if he has a lot of unrepayed credits
+// Submitter has a bad reputation if
