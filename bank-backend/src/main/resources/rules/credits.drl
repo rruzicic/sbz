@@ -1,0 +1,88 @@
+import com.sbz.bank.model.*;
+import java.util.List;
+import java.util.Date;
+
+// resources:
+// project specification
+// https://www.forbes.com/advisor/personal-loans/personal-loan-requirements/
+// https://www.investopedia.com/financial-edge/0411/5-things-you-need-to-be-pre-approved-for-a-mortgage.aspx
+
+function double calculateSumBalance(List bankAccounts) {
+    List<BankAccount> bankAccountsTyped = (List<BankAccount>) bankAccounts;
+    double sum = 0.0;
+    
+    for(BankAccount bankAccount : bankAccountsTyped) {
+        sum += bankAccount.getBalance();
+    }
+
+    return sum;
+}
+
+function double calculateCreditMonthlyPayment(double creditAmount, int rateNumber) {
+    return creditAmount / rateNumber;
+}
+
+function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests) {
+    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
+    double sum = 0.0;
+
+    for(CreditRequest creditRequest : creditRequests) {
+        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED) {
+            sum += calculateCreditMonthlyPayment(creditRequest.getMoneySum(), creditRequest.getRateNumber());
+        }
+    }
+
+    return sum;
+}
+
+
+rule "Say hi when a new credit req comes up"
+    no-loop
+    when
+        $creditRequest: CreditRequest()
+        shouldApproveCredit()
+    then
+        modify($creditRequest){setRecommendApproval(true);}
+        System.out.println("Credit has been recommended for approval for client: " + $creditRequest.getClient().getFirstName() + " " + $creditRequest.getClient().getLastName());
+end
+
+query shouldApproveCredit()
+    oldClientLongCredit()
+end
+
+query oldClientLongCredit()
+    not CreditRequest(
+        client.age >= 60,
+        rateNumber >= 120
+    )
+    and clientHasStableEarnings()
+end
+
+query clientHasStableEarnings()
+    CreditRequest(
+        clientEmploymentStatus != EmploymentStatus.UNEMPLOYED
+    ) and clientHasEnoughAssets()
+end
+
+// since we don't have assets per se, we will use current balance on all accounts
+query clientHasEnoughAssets()
+    CreditRequest(
+        calculateSumBalance(client.accounts) > moneySum * 0.20
+    ) and clientHasGoodDTI()
+end
+
+// see if client has above 36% DTI to take on a new loan
+query clientHasGoodDTI()
+    CreditRequest(
+        clientIncome >= 1.36 * (calculateCurrentMonthlyDebtForClient(client.creditRequests) + calculateCreditMonthlyPayment(moneySum, rateNumber))
+    ) and clientCanPayThroughoutCreditLifecycle()
+end
+
+// see if a temp worker client's contract ends during credit payout
+// and if the client's contract starts before the min date payout
+query clientCanPayThroughoutCreditLifecycle()
+    CreditRequest(
+        (clientContractStart == null) || (clientContractStart < creditEndMin), // contract has to start before first possible loan payout, not necessary but w/e
+        (clientContractEnd == null) || (clientContractEnd > creditEndMax) // contract has to end after last possible loan payout
+    )
+end

@@ -12,10 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
@@ -24,25 +21,42 @@ import lombok.experimental.FieldDefaults;
 @Table
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 public class CreditRequest extends BaseEntity {
 	@ManyToOne
-	@JoinColumn(name = "submitter_id", nullable = false)
+	@JoinColumn(name = "client_id", nullable = false)
 	@JsonBackReference("requestsBackReference")
-	User submitter;
-	@Column
-	double amount;
-	@Column
-	int loanTerm;
-	@Column
+	User client;
+
+	@Column(name = "client_income", nullable = false)
+	double clientIncome;
+
+	@Column(name = "money_sum", nullable = false)
+	double moneySum;
+
+	@Column(name = "rate_number", nullable = false)
+	int rateNumber;
+
+	@Column(name = "client_employment_status", nullable = false)
 	@Enumerated(EnumType.STRING)
-	EmploymentStatus employmentStatus;
-	@Column
-	Date employmentStartDate;
-	@Column
-	Date temporaryContractExpiry;
+	EmploymentStatus clientEmploymentStatus;
+
+	@Column(name = "client_contract_start", nullable = true)
+	Date clientContractStart;
+
+	@Column(name = "client_contract_end", nullable = true)
+	Date clientContractEnd;
+
+	@Column(name = "credit_end_min", nullable = false)
+	Date creditEndMin;
+
+	@Column(name = "credit_end_max", nullable = false)
+	Date creditEndMax;
+
 	@Column
 	@Enumerated(EnumType.STRING)
 	CreditStatus creditStatus;
+
 	@Column
 	boolean recommendApproval;
 }
