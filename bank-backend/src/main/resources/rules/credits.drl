@@ -37,10 +37,13 @@ function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests)
 
 
 rule "Say hi when a new credit req comes up"
+    no-loop
     when
+        $creditRequest: CreditRequest()
         shouldApproveCredit()
     then
-        System.out.println("CREDIIIIIT");
+        modify($creditRequest){setRecommendApproval(true);}
+        System.out.println("Credit has been recommended for approval for client: " + $creditRequest.getClient().getFirstName() + " " + $creditRequest.getClient().getLastName());
 end
 
 query shouldApproveCredit()
@@ -64,7 +67,7 @@ end
 // since we don't have assets per se, we will use current balance on all accounts
 query clientHasEnoughAssets()
     CreditRequest(
-        calculateSumBalance(client.accounts) > moneySum
+        calculateSumBalance(client.accounts) > moneySum * 0.20
     ) and clientHasGoodDTI()
 end
 
