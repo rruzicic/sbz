@@ -64,13 +64,13 @@
 				<!-- RENDER FOR AUTHENTICATED -->
 				{#if $user.role !== ''}
 				<li class="nav-item" >
-					<button class="nav-link" href="/transaction/all">Transactions</button>
+					<a class="nav-link" href="/transaction/all">Transactions</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="/bank-account/all">Bank accounts</a>
 				</li>
 				<li class="nav-item" >
-					<button class="nav-link" href="/credit-request/all">Credit requests</button>
+					<a class="nav-link" href="/credit-request/all">Credit requests</a>
 				</li>
 				<li class="nav-item" >
 					<button class="nav-link" on:click={handleLogout}>Logout</button>

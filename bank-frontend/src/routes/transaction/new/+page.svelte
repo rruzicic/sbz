@@ -6,12 +6,12 @@
 	import LeafletMap from '../../../lib/LeafletMap.svelte';
 
 	let transaction = {location: {longitude: 0, latitude: 0}};
-	/*let config = {
+	let config = {
 		headers: {
 			Authorization: `Basic ${localStorage.getItem('access_token')}`
 		}
 	};
-*/
+
     function mapValues() {
         transaction.cvv = parseInt(transaction.cvv);
         transaction.receiverId = parseInt(transaction.receiverId);

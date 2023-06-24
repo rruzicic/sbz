@@ -34,6 +34,12 @@ public class TransactionController {
 		return ResponseEntity.ok(transactionService.getAll());
 	}
 
+	@GetMapping("/my")
+	public ResponseEntity<List<Transaction>> getMyTransactions() {
+		Long userId = ((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
+		return ResponseEntity.ok(transactionService.getBySenderId(userId));
+	}
+
 	@GetMapping("/{id}")
 	public ResponseEntity<Transaction> getById(@PathVariable Long id) {
 		return ResponseEntity.ok(transactionService.getById(id));
@@ -41,10 +47,11 @@ public class TransactionController {
 
 	@PostMapping("/submit")
 	public ResponseEntity<Transaction> createTransaction(@Valid @RequestBody TransactionDTO transactionDto) {
-		Transaction createdTransaction = transactionService.createTransaction(transactionDto.transactionDtoToTransaction());
+		Transaction transaction = transactionDto.transactionDtoToTransaction();
 		User sender = new User();
 		sender.setId(((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
-		createdTransaction.setSender(sender);
+		transaction.setSender(sender);
+		Transaction createdTransaction = transactionService.createTransaction(transaction);
 		return createdTransaction != null ? ResponseEntity.ok(createdTransaction) : ResponseEntity.badRequest().build();
 	}
 

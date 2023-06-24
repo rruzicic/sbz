@@ -35,11 +35,11 @@ public class TransactionService {
 
 	public Transaction createTransaction(Transaction transaction) {
 		if(!isTransactionValid(transaction)) return null;
+
 		transaction.setTimeOfTransaction(LocalDateTime.now());
-		//Transaction savedTransaction = transactionRepository.save(transaction);
 		transaction.setSender(userService.getById(transaction.getSender().getId()));
 		transaction.setReceiver(userService.getById(transaction.getReceiver().getId()));
-		//System.out.println(transaction.getSender().getOutboundTransaction());
+
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
 		kieSession.setGlobal("userService", userService);
@@ -52,6 +52,10 @@ public class TransactionService {
 		return transactionRepository.save(transaction);
 	}
 
+	public List<Transaction> getBySenderId(Long id) {
+		return transactionRepository.getBySenderId(id);
+	}
+
 	public boolean deleteTransaction(Long id) {
 		if (transactionRepository.existsById(id)) {
 			transactionRepository.deleteById(id);
@@ -61,7 +65,7 @@ public class TransactionService {
 	}
 
 	private boolean isTransactionValid(Transaction transaction) {
-		if (!bothUsersExist(transaction.getSender().getId(), transaction.getReceiver().getId())) return false;
+		if (!bothUsersExist(transaction)) return false;
 		User sender = userService.getById(transaction.getSender().getId());
 		User receiver = userService.getById(transaction.getReceiver().getId());
 		if (sender.getRole() != Role.USER || receiver.getRole() != Role.USER) return false;
@@ -70,8 +74,9 @@ public class TransactionService {
 		if (!updateBalances(receiver, sender, transaction.getAmount(), senderAccount)) return false;
 		return true;
 	}
-	private boolean bothUsersExist(Long id1, Long id2) {
-		return userService.exists(id1) && userService.exists(id2);
+	private boolean bothUsersExist(Transaction transaction) {
+		if (transaction == null || transaction.getSender() == null || transaction.getReceiver() == null) return false;
+		return userService.exists(transaction.getSender().getId()) && userService.exists(transaction.getSender().getId());
 	}
 	private BankAccount getSenderAccountWithMatchingCvv(Transaction transaction, User sender) {
 		return sender.getAccounts().stream().filter(bankAccount ->
