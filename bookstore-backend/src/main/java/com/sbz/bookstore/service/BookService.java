@@ -85,32 +85,36 @@ public class BookService {
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
 		kieSession.insert(recommendedBooks);
 		UserStatus userStatus = new UserStatus();
-		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
+		var books3 = 	getBooksSimilarToBooksUserLikes(userId);
+		//userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
 
-		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
+		//userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
 
-		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
+		//userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
 
-		userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
+		//userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
 
-		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
+		//kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
+		//kieSession.fireAllRules();
+		//kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
+		//kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("books").setFocus();
 		kieSession.fireAllRules();
-		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
-		kieSession.fireAllRules();
-		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
-		kieSession.fireAllRules();
-		kieSession.getAgenda().getAgendaGroup("final").setFocus();
-		kieSession.fireAllRules();
+		//kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
+		//kieSession.fireAllRules();
+		//kieSession.getAgenda().getAgendaGroup("final").setFocus();
+		//kieSession.fireAllRules();
 
 		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();
 		}
 
-		return recommendedBooks.getRecommendedBooks();
+		//return recommendedBooks.getRecommendedBooks();
+		return userStatus.getBooksSimilarToBooksUserLikes();
 	}
 
 	public Book getById(Long id) {

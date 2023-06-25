@@ -4,6 +4,7 @@ import com.sbz.bookstore.model.Genre;
 import com.sbz.bookstore.model.User;
 import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
 import com.sbz.bookstore.model.facts.UserStatus;
+import com.sbz.bookstore.model.Review;
 import java.time.LocalDate;
 
 rule "User is new if he has less than 10 reviews"
@@ -46,6 +47,36 @@ rule "User did choose his favourite genres"
         modify($userStatus) {setHasChosenFavouriteGenres(true);}
 end
 
+rule "Find books similar to books user likes"
+    agenda-group "books"
+    lock-on-active
+    when
+        $userStatus: UserStatus()
+        $user: User($favBooks: getBooksUserLikes())
+        $book1: Book($reviews: reviews) from $favBooks
+        $book2: Book(id != $book1.getId())
+        $all : Number(floatValue > 0) from accumulate (
+                 Review(getUser().getRatingForBook($book2.getId()) != -1
+
+                ) from $reviews,
+                //int numberOfSameRatings=0;numberOfSameRatings += $dist;numberOfSameRatings/
+                init(int numberOfReviewers=0; ),
+                action(numberOfReviewers += 1; ),
+                result((float)numberOfReviewers)
+        )
+        $same : Number(floatValue/$all.floatValue() > (float) 0.7) from accumulate (
+                        $r: Review(checkRatingSimilarity(getRating(), getUser().getRatingForBook($book2.getId()))
+
+                        ) from $reviews,
+                        //int numberOfSameRatings=0;numberOfSameRatings += $dist;numberOfSameRatings/
+                        init(int numberOfSameRatings=0; ),
+                        action(numberOfSameRatings += 1; ),
+                        result((float)numberOfSameRatings)
+                )
+    then
+        modify($userStatus){addBookToSimilarBooks($book2)}
+end
+/*
 rule "recommend 10 best books if user chose his favourite genres"
     agenda-group "recommend-books"
     lock-on-active
@@ -98,3 +129,4 @@ rule "Sort the list by recommendation points"
     then
         modify($recommendationList){sortByRecommendationPoints();}
 end
+*/

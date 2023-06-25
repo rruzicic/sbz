@@ -24,6 +24,16 @@ public class UserStatus {
         interestingBooks = new ArrayList<Book>();
     }
 
+    public void addBookToSimilarBooks(Book book)
+    {
+        for(Book b: booksSimilarToBooksUserLikes)
+        {
+            if (b.getId() == book.getId())
+                return;
+        }
+        booksSimilarToBooksUserLikes.add(book);
+    }
+
     public boolean getIsUserNew(){
         return isUserNew;
     }

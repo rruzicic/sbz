@@ -30,4 +30,13 @@ public class Review extends BaseEntity {
 
 	@Column
 	double rating;
+
+	public boolean checkRatingSimilarity(double rating1, double rating2)
+	{
+		if(rating1==-1 || rating2==-1)
+			return false;
+		if(Math.abs(rating1 - rating2) <= 1)
+			return true;
+		return false;
+	}
 }
