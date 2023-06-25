@@ -4,6 +4,7 @@ import com.sbz.bank.dto.CreditRequestDTO;
 import com.sbz.bank.model.BankAccount;
 import com.sbz.bank.model.CreditRequest;
 import com.sbz.bank.model.CreditStatus;
+import com.sbz.bank.model.CustomUserDetails;
 import com.sbz.bank.model.User;
 import com.sbz.bank.service.BankAccountService;
 import com.sbz.bank.service.CreditRequestService;
@@ -13,6 +14,7 @@ import java.util.List;
 import com.sbz.bank.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,7 +43,7 @@ public class CreditRequestController {
 
 	@PostMapping("/new")
 	public ResponseEntity<CreditRequest> createCreditRequest(@RequestBody CreditRequestDTO creditRequestDTO) {
-		User user = userService.getById(creditRequestDTO.getClientId());
+		User user = userService.getById(((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());
 		CreditRequest creditRequest = new CreditRequest(
 				user,
 				creditRequestDTO.getClientIncome(),
