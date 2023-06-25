@@ -60,6 +60,8 @@ public class CreditRequestController {
 				creditRequestDTO.getCreditEndMin(),
 				creditRequestDTO.getCreditEndMax(),
 				CreditStatus.PENDING,
+				false,
+				false,
 				false
 		);
 
