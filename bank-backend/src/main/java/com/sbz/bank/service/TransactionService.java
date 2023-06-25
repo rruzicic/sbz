@@ -9,6 +9,7 @@ import com.sbz.bank.model.User;
 import com.sbz.bank.repository.CreditRequestRepository;
 import com.sbz.bank.repository.TransactionRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,11 +36,11 @@ public class TransactionService {
 
 	public Transaction createTransaction(Transaction transaction) {
 		if(!isTransactionValid(transaction)) return null;
+
 		transaction.setTimeOfTransaction(LocalDateTime.now());
-		//Transaction savedTransaction = transactionRepository.save(transaction);
 		transaction.setSender(userService.getById(transaction.getSender().getId()));
 		transaction.setReceiver(userService.getById(transaction.getReceiver().getId()));
-		//System.out.println(transaction.getSender().getOutboundTransaction());
+
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
 		kieSession.setGlobal("userService", userService);
@@ -52,6 +53,10 @@ public class TransactionService {
 		return transactionRepository.save(transaction);
 	}
 
+	public List<Transaction> getBySenderId(Long id) {
+		return transactionRepository.getBySenderId(id);
+	}
+
 	public boolean deleteTransaction(Long id) {
 		if (transactionRepository.existsById(id)) {
 			transactionRepository.deleteById(id);
@@ -61,17 +66,18 @@ public class TransactionService {
 	}
 
 	private boolean isTransactionValid(Transaction transaction) {
-		if (!bothUsersExist(transaction.getSender().getId(), transaction.getReceiver().getId())) return false;
+		if (!bothUsersExist(transaction)) return false;
 		User sender = userService.getById(transaction.getSender().getId());
 		User receiver = userService.getById(transaction.getReceiver().getId());
 		if (sender.getRole() != Role.USER || receiver.getRole() != Role.USER) return false;
 		BankAccount senderAccount = getSenderAccountWithMatchingCvv(transaction, sender);
-		if (senderAccount == null) return false;
+		if (senderAccount == null || !monthYearDateMatches(transaction.getExpiryDate(), senderAccount.getCreditCardExpiryDate())) return false;
 		if (!updateBalances(receiver, sender, transaction.getAmount(), senderAccount)) return false;
 		return true;
 	}
-	private boolean bothUsersExist(Long id1, Long id2) {
-		return userService.exists(id1) && userService.exists(id2);
+	private boolean bothUsersExist(Transaction transaction) {
+		if (transaction == null || transaction.getSender() == null || transaction.getReceiver() == null) return false;
+		return userService.exists(transaction.getSender().getId()) && userService.exists(transaction.getSender().getId());
 	}
 	private BankAccount getSenderAccountWithMatchingCvv(Transaction transaction, User sender) {
 		return sender.getAccounts().stream().filter(bankAccount ->
@@ -84,5 +90,9 @@ public class TransactionService {
 		senderAccount.setBalance(senderAccount.getBalance() - transactionAmount);
 		receiver.getAccounts().get(0).setBalance(receiver.getAccounts().get(0).getBalance() + transactionAmount);
 		return userService.updateUser(sender) != null && userService.updateUser(receiver) != null;
+	}
+
+	private boolean monthYearDateMatches(LocalDateTime date1, LocalDateTime date2) {
+		return date1.getYear() == date2.getYear() && date1.getMonth() == date2.getMonth();
 	}
 }

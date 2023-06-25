@@ -1,6 +1,7 @@
 package com.sbz.bank.service;
 
 import com.sbz.bank.model.Role;
+import com.sbz.bank.model.Transaction;
 import com.sbz.bank.model.User;
 import com.sbz.bank.repository.UserRepository;
 

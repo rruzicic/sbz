@@ -20,9 +20,6 @@ import lombok.experimental.FieldDefaults;
 public class TransactionDTO {
 	@NotNull
 	@Min(1)
-	Long senderId;
-	@NotNull
-	@Min(1)
 	Long receiverId;
 	@Min(100)
 	int cvv;
@@ -37,15 +34,11 @@ public class TransactionDTO {
 		User receiver = new User();
 		receiver.setId(this.receiverId);
 
-		User sender = new User();
-		sender.setId(this.senderId);
-
 		Transaction transaction = new Transaction();
 		transaction.setAmount(this.amount);
 		transaction.setCvv(this.cvv);
 		transaction.setExpiryDate(this.expiryDate);
 		transaction.setLocation(this.location);
-		transaction.setSender(sender);
 		transaction.setReceiver(receiver);
 		return transaction;
 	}

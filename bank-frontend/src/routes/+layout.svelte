@@ -46,6 +46,12 @@
 				<li class="nav-item">
 					<a class="nav-link" href="/bank-account/new">New bank account</a>
 				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="/transaction/new">New transaction</a>
+				</li>
+				<li class="nav-item" >
+					<a class="nav-link" href="/credit-request/new">New credit requests</a>
+				</li>
 				{/if}
 
 				<!-- RENDER FOR UNAUTHENTICATED -->
@@ -61,13 +67,13 @@
 				<!-- RENDER FOR AUTHENTICATED -->
 				{#if $user.role !== ''}
 				<li class="nav-item" >
-					<button class="nav-link" href="/transaction/all">Transactions</button>
+					<a class="nav-link" href="/transaction/all">Transactions</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="/bank-account/all">Bank accounts</a>
 				</li>
 				<li class="nav-item" >
-					<button class="nav-link" href="/credit-request/all">Credit requests</button>
+					<a class="nav-link" href="/credit-request/all">Credit requests</a>
 				</li>
 				<li class="nav-item" >
 					<button class="nav-link" on:click={handleLogout}>Logout</button>
@@ -77,7 +83,7 @@
 		</div>
 	</div>
 </nav>
-
+<br>
 <div class="container">
 	<slot />
 </div>
