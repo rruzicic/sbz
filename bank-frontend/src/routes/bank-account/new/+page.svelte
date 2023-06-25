@@ -3,8 +3,6 @@
 	import Input from '../../../lib/Input.svelte';
     import { toast } from '../../../lib/stores/toast';
     import { goto } from '$app/navigation';
-	
-
 
 	let balance = 0;
 	let config = {
