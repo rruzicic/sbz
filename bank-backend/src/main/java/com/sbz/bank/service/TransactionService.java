@@ -9,6 +9,7 @@ import com.sbz.bank.model.User;
 import com.sbz.bank.repository.CreditRequestRepository;
 import com.sbz.bank.repository.TransactionRepository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class TransactionService {
 		User receiver = userService.getById(transaction.getReceiver().getId());
 		if (sender.getRole() != Role.USER || receiver.getRole() != Role.USER) return false;
 		BankAccount senderAccount = getSenderAccountWithMatchingCvv(transaction, sender);
-		if (senderAccount == null) return false;
+		if (senderAccount == null || !monthYearDateMatches(transaction.getExpiryDate(), senderAccount.getCreditCardExpiryDate())) return false;
 		if (!updateBalances(receiver, sender, transaction.getAmount(), senderAccount)) return false;
 		return true;
 	}
@@ -89,5 +90,9 @@ public class TransactionService {
 		senderAccount.setBalance(senderAccount.getBalance() - transactionAmount);
 		receiver.getAccounts().get(0).setBalance(receiver.getAccounts().get(0).getBalance() + transactionAmount);
 		return userService.updateUser(sender) != null && userService.updateUser(receiver) != null;
+	}
+
+	private boolean monthYearDateMatches(LocalDateTime date1, LocalDateTime date2) {
+		return date1.getYear() == date2.getYear() && date1.getMonth() == date2.getMonth();
 	}
 }

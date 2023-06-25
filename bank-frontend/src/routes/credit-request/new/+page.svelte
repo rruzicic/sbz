@@ -54,7 +54,7 @@ Employment type:
 <select class="form-select" bind:value={creditRequest.clientEmploymentStatus}>
 	<option value="UNEMPLOYED">Unemployed</option>
 	<option value="TEMPORARY">Temporary</option>
-	<option value="INDEFINITE">Indefinite</option>
+	<option value="INDEFINITE">Permanent</option>
 </select>
 <Input label="Credit payment from" type="date" bind:value={creditRequest.creditEndMin} />
 <Input label="Credit payment to" type="date" bind:value={creditRequest.creditEndMax} />
