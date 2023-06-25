@@ -3,6 +3,7 @@
 	export let type = 'text';
 	export let label;
 	export let errors = [];
+	export let disabled = false;
 
 	function typeAction(node) {
 		node.type = type;
@@ -13,7 +14,7 @@
 </script>
 
 {label}:
-<input class="form-control" use:typeAction bind:value />
+<input class="form-control" use:typeAction bind:value disabled={disabled} />
 <span class="text-danger">
 	{#each errors as error}
 		{#if error !== ''}

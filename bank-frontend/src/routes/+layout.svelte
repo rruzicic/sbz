@@ -49,6 +49,9 @@
 				<li class="nav-item">
 					<a class="nav-link" href="/transaction/new">New transaction</a>
 				</li>
+				<li class="nav-item" >
+					<a class="nav-link" href="/credit-request/new">New credit requests</a>
+				</li>
 				{/if}
 
 				<!-- RENDER FOR UNAUTHENTICATED -->
