@@ -54,8 +54,7 @@ query oldClientLongCredit()
     not CreditRequest(
         client.age >= 60,
         rateNumber >= 120
-    )
-    and clientHasStableEarnings()
+    ) and clientHasStableEarnings()
 end
 
 query clientHasStableEarnings()
@@ -84,5 +83,10 @@ query clientCanPayThroughoutCreditLifecycle()
     CreditRequest(
         (clientContractStart == null) || (clientContractStart < creditEndMin), // contract has to start before first possible loan payout, not necessary but w/e
         (clientContractEnd == null) || (clientContractEnd > creditEndMax) // contract has to end after last possible loan payout
-    )
+    ) and clientMissedLoanPayment()
+end
+
+// see if client missed a loan payment or didn't pay a previous loan
+query clientMissedLoanPayment()
+    not (CreditRequest(creditStatus == CreditStatus.APPROVED, missedPayment == true) or CreditRequest(creditStatus == CreditStatus.APPROVED, paymentOverdue == true))
 end

@@ -53,10 +53,16 @@ public class CreditRequest extends BaseEntity {
 	@Column(name = "credit_end_max", nullable = false)
 	Date creditEndMax;
 
-	@Column
+	@Column(name = "credit_status", nullable = false)
 	@Enumerated(EnumType.STRING)
 	CreditStatus creditStatus;
 
-	@Column
+	@Column(name = "recommended_approval", nullable = false)
 	boolean recommendApproval;
+
+	@Column(name= "missed_payment", nullable = false)
+	boolean missedPayment;	// missed a monthly loan payment
+
+	@Column(name = "payment_overdue", nullable = false)
+	boolean paymentOverdue; // didn't pay the loan after max end
 }
