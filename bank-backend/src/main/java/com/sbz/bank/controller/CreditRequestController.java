@@ -41,6 +41,11 @@ public class CreditRequestController {
 		return ResponseEntity.ok(creditRequestService.getById(id));
 	}
 
+	@GetMapping("/my")
+	public ResponseEntity<List<CreditRequest>> getMyCreditRequests() {
+		return ResponseEntity.ok(creditRequestService.getByClient(((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId()));
+	}
+
 	@PostMapping("/new")
 	public ResponseEntity<CreditRequest> createCreditRequest(@RequestBody CreditRequestDTO creditRequestDTO) {
 		User user = userService.getById(((CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId());

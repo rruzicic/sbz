@@ -45,6 +45,7 @@
 		setTimeout(() => new bootstrap.Toast(document.querySelector('#liveToast')).show(), 10);
 	}
 </script>
+<h1>Apply for a credit request</h1>
 
 <Input label="Income" type="number" bind:value={creditRequest.clientIncome} />
 <Input label="Money sum" type="number" bind:value={creditRequest.moneySum} />

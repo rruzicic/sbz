@@ -24,6 +24,10 @@ public class CreditRequestService {
 		return creditRequestRepository.findById(id).get();
 	}
 
+	public List<CreditRequest> getByClient(Long id) {
+		return creditRequestRepository.findByClient(id);
+	}
+
 	public CreditRequest createCreditRequest(CreditRequest creditRequest) {
 		KieContainer kieContainer = new KieConfig().kieContainer();
 		KieSession kieSession = kieContainer.newKieSession();
