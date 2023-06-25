@@ -35,6 +35,19 @@ function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests)
     return sum;
 }
 
+function int numberOfMissedLoanPayments(List ongoingCreditRequests) {
+    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
+    int ctr = 0;
+
+    for(CreditRequest creditRequest : creditRequests) {
+        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED && creditRequest.isMissedPayment() || creditRequest.isPaymentOverdue()) {
+            ctr += 1;
+        }
+    }
+
+    return ctr;
+}
+
 
 rule "Say hi when a new credit req comes up"
     no-loop
@@ -66,7 +79,7 @@ end
 // since we don't have assets per se, we will use current balance on all accounts
 query clientHasEnoughAssets()
     CreditRequest(
-        calculateSumBalance(client.accounts) > moneySum * 0.20
+        calculateSumBalance(client.accounts) > (moneySum * 0.20)
     ) and clientHasGoodDTI()
 end
 
@@ -88,5 +101,7 @@ end
 
 // see if client missed a loan payment or didn't pay a previous loan
 query clientMissedLoanPayment()
-    not (CreditRequest(creditStatus == CreditStatus.APPROVED, missedPayment == true) or CreditRequest(creditStatus == CreditStatus.APPROVED, paymentOverdue == true))
+    not CreditRequest(
+        numberOfMissedLoanPayments(client.creditRequests) >= 1
+    )
 end
