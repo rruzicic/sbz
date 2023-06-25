@@ -2,6 +2,7 @@ import com.sbz.bookstore.model.Book;
 import com.sbz.bookstore.model.RatingLevel;
 import com.sbz.bookstore.model.Genre;
 import com.sbz.bookstore.model.User;
+import com.sbz.bookstore.model.Author;
 import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
 import com.sbz.bookstore.model.facts.UserStatus;
 import java.time.LocalDate;
@@ -25,6 +26,41 @@ rule "User is NOT new if he has more or equal to 10 reviews"
     then
         modify($userStatus) { setIsUserNew(false); }
 end
+
+/*
+rule "Get All Books by Author" salience 100
+    agenda-group "setup-10-best-books"
+    when
+        $author: Author()
+        $allBooks: List() from collect(Book())
+        $allBooksByAuthor: Book(author == $author) from $allBooks
+    then
+        // Add the book to the result list
+        insert($allBooksByAuthor);
+end
+
+rule "Check if Author Belongs to Genre" salience 90
+    agenda-group "setup-10-best-books"
+    when
+        $author: Author()
+        $genre: Genre()
+        $allBooksByAuthor: Book()
+        accumulate(
+            $book: Book() from $allBooksByAuthor,
+            $sumAll: count($book),
+            $countSpecificGenre: Integer() from accumulate(
+                Book(genre == $genre) from $allBooksByAuthor,
+                count(1)
+            )
+        )
+        $genreRatio: Double() from ($countSpecificGenre.doubleValue() / $sumAll.doubleValue())
+        eval($genreRatio >= 0.3)
+    then
+        // Author belongs to the genre
+        // Do something with the information
+        // You can use the author and genre variables further in your application
+end
+*/
 
 rule "User did NOT choose his favourite genres"
     agenda-group "user-choose-genres"
@@ -78,13 +114,53 @@ rule "Book similar to books user likes"
          modify($recommendationList){addToRecommended($book);}
 end
 
+
+rule "Get Interesting Authors for User"
+    agenda-group "interesting-books"
+    when
+        $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks(), $interestingAuthors: getInterestingAuthors())
+        $books: Book() from $boughtBooks // Retrieve bought books for the user
+        $author: Author() from collect(Author())
+        $count: Long() from accumulate(
+            $book: Book(author == $author) from $books,
+            count($book)
+        )
+        eval($count >= 3)
+    then
+        $interestingAuthors.add($author);
+end
+
+
+rule "Get Interesting Genres for User"
+    agenda-group "interesting-books"
+    when
+        $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks(), $interestingGenres: getInterestingGenres())
+        $books: Book() from $boughtBooks // Retrieve bought books for the user
+        $totalNumOfBooks: Long() from accumulate(
+            $book: Book() from $books,
+            count($book)
+        )
+        $genre: Genre() from collect(Genre())
+        $count: Long() from accumulate(
+            $book: Book(genre == $genre) from $books,
+            count($book)
+        )
+        eval(($count.floatValue() / $totalNumOfBooks.floatValue()) >= (30.0/100.0))
+    then
+        $interestingGenres.add($genre);
+end
+
+
 rule "Recommend books that would be interesting to user"
     agenda-group "recommend-books"
     lock-on-active
     when
         $userStatus: UserStatus(isUserNew == false)
-        $book: Book($userStatus.getInterestingBooks.contains($book))
+        //$book: Book($userStatus.getInterestingBooks.contains($book))
         $recommendationList: RegularUserRecommendedBooks()
+        $interestingGenres: Genre()
+        $interestingAuthors: Author()
+        $book: Book(author memberOf $interestingAuthors || genre memberOf $interestingGenres)
     then
         modify($recommendationList){addToRecommended($book);}
 end

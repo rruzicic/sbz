@@ -91,6 +91,7 @@ public class BookService {
 
 		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
 
+		userStatus.setBoughtBooks(getBoughtBooks(userId));
 		userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
@@ -101,10 +102,18 @@ public class BookService {
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
 		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("interesting-books").setFocus();
+		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("final").setFocus();
 		kieSession.fireAllRules();
+
+		if(userStatus.getIsUserNew() == true){
+			System.out.println("Ana je nov korisnik");
+		} else{
+			System.out.println("Ana je stari korisnik");
+		}
 
 		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();
