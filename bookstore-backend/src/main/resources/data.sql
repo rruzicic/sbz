@@ -68,7 +68,18 @@ INSERT INTO book_order (discount, user_id) VALUES (0, 2);
 
 
 INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 1);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 1);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 1);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 1);
 INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 2, 1);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 1, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 2, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 2, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 2, 2);
+INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 2, 2);
 INSERT INTO item (discount, quantity, book_id, order_id) VALUES (5, 2, 3, 2);
 INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 4, 2);
 

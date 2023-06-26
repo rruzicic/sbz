@@ -92,9 +92,12 @@ public class BookService {
 		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
 
 		userStatus.setBoughtBooks(getBoughtBooks(userId));
-		userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
+		userStatus.setAllAuthors(authorRepository.findAll());
+		//userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
+		kieSession.insert(authorRepository.findAll());
+		kieSession.insert(bookRepository.findAll());
 
 		//TODO Fire rules from the rules engine
 
@@ -110,9 +113,9 @@ public class BookService {
 		kieSession.fireAllRules();
 
 		if(userStatus.getIsUserNew() == true){
-			System.out.println("Ana je nov korisnik");
+			System.out.println("nov korisnik");
 		} else{
-			System.out.println("Ana je stari korisnik");
+			System.out.println("stari korisnik");
 		}
 
 		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){

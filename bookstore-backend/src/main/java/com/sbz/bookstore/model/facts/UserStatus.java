@@ -15,7 +15,9 @@ public class UserStatus {
     private List<Book> tenMostPopularBooksByFourAuthors;
     private List<Book> booksSimilarToBooksUserLikes;
     private List<Book> boughtBooks;
+    private List<Author> allAuthors;
     private List<Author> interestingAuthors;
+    private List<Genre> allGenres;
     private List<Genre> interestingGenres;
     private List<Book> interestingBooks;
 
@@ -27,7 +29,12 @@ public class UserStatus {
         tenMostPopularBooksByFourAuthors = new ArrayList<Book>();
         booksSimilarToBooksUserLikes = new ArrayList<Book>();
         boughtBooks = new ArrayList<Book>();
+        allAuthors = new ArrayList<Author>();
         interestingAuthors = new ArrayList<Author>();
+        allGenres = new ArrayList<Genre>();
+        allGenres.add(Genre.NOVEL);
+        allGenres.add(Genre.EDUCATION);
+        allGenres.add(Genre.ROMANCE);
         interestingGenres = new ArrayList<Genre>();
         interestingBooks = new ArrayList<Book>();
     }
@@ -67,6 +74,13 @@ public class UserStatus {
         this.boughtBooks = boughtBooks;
     }
 
+    public List<Author> getAllAuthors() {
+        return allAuthors;
+    }
+
+    public void setAllAuthors(List<Author> allAuthors) {
+        this.allAuthors = allAuthors;
+    }
 
     public List<Book> getInterestingBooks() {
         return interestingBooks;
@@ -84,11 +98,27 @@ public class UserStatus {
         this.interestingAuthors = interestingAuthors;
     }
 
+    public void addToInterestingAuthors(Author author){
+        this.interestingAuthors.add(author);
+    }
+
+    public List<Genre> getAllGenres() {
+        return allGenres;
+    }
+
+    public void setAllGenres(List<Genre> allGenres) {
+        this.allGenres = allGenres;
+    }
+
     public List<Genre> getInterestingGenres() {
         return interestingGenres;
     }
 
     public void setInterestingGenres(List<Genre> interestingGenres) {
         this.interestingGenres = interestingGenres;
+    }
+
+    public void addToInterestingGenres(Genre genre){
+        this.interestingGenres.add(genre);
     }
 }
