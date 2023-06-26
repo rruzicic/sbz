@@ -85,10 +85,11 @@ rule "Get Interesting Authors for User"
     agenda-group "interesting-books"
     lock-on-active
     when
-        $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks(), $allAuthors: getAllAuthors(), $interestingAuthors: getInterestingAuthors())
+        $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks())
+        //, $allAuthors: getAllAuthors(), $interestingAuthors: getInterestingAuthors()
         $author: Author()
         Number(intValue >= 3) from accumulate(
-            $book: Book(author == $author) from $boughtBooks,
+            $book: Book(author.getId() == $author.getId()) from $boughtBooks,
             count($book)
         )
     then

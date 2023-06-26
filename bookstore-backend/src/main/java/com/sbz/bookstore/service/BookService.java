@@ -96,11 +96,16 @@ public class BookService {
 		//userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
-		kieSession.insert(authorRepository.findAll());
-		kieSession.insert(bookRepository.findAll());
+		//kieSession.insert(authorRepository.findAll());
+		List<Author> allAuthors = authorRepository.findAll();
+		for(Author author: allAuthors)
+		{
+			kieSession.insert(author);
+		}
+		//kieSession.insert(bookRepository.findAll());
 
 		//TODO Fire rules from the rules engine
-
+		var authors = getInterestingAuthorsForUser(userId);
 		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
