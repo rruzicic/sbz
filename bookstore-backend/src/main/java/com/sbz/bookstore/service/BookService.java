@@ -96,13 +96,17 @@ public class BookService {
 		//userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
-		//kieSession.insert(authorRepository.findAll());
 		List<Author> allAuthors = authorRepository.findAll();
 		for(Author author: allAuthors)
 		{
 			kieSession.insert(author);
 		}
-		//kieSession.insert(bookRepository.findAll());
+		List<Book> allBooks = bookRepository.findAll();
+		for(Book book: allBooks)
+		{
+			kieSession.insert(book);
+		}
+
 
 		//TODO Fire rules from the rules engine
 		var authors = getInterestingAuthorsForUser(userId);

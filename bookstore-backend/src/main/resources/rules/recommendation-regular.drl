@@ -86,7 +86,6 @@ rule "Get Interesting Authors for User"
     lock-on-active
     when
         $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks())
-        //, $allAuthors: getAllAuthors(), $interestingAuthors: getInterestingAuthors()
         $author: Author()
         Number(intValue >= 3) from accumulate(
             $book: Book(author.getId() == $author.getId()) from $boughtBooks,
@@ -124,8 +123,9 @@ rule "Recommend books that would be interesting to user"
     when
         $userStatus: UserStatus(isUserNew == false, $interestingGenres: getInterestingGenres(), $interestingAuthors: getInterestingAuthors())
         $recommendationList: RegularUserRecommendedBooks()
-        $book: Book(author memberOf $interestingAuthors || genre memberOf $interestingGenres)
+        $book: Book($book.getAuthor() memberOf $interestingAuthors || $book.getGenre() memberOf $interestingGenres)
     then
+        modify($userStatus){addToInterestingBooks($book);}
         modify($recommendationList){addToRecommended($book);}
 end
 

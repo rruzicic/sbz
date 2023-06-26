@@ -90,6 +90,10 @@ public class UserStatus {
         this.interestingBooks = interestingBooks;
     }
 
+    public void addToInterestingBooks(Book book){
+        this.interestingBooks.add(book);
+    }
+
     public List<Author> getInterestingAuthors() {
         return interestingAuthors;
     }
