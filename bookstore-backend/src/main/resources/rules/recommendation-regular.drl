@@ -97,7 +97,7 @@ rule "similar users"
     modify($userStatus){addUserToSimilarUsers($user)};
 end
 rule "books liked by similar users"
-    agenda-group "similar-users-books"//vidi
+    agenda-group "similar-users-books"
     lock-on-active
     when
     $userStatus: UserStatus($similarUsers: getSimilarUsers())
@@ -105,6 +105,17 @@ rule "books liked by similar users"
     $book: Book($user.getRatingForBook(getId()) >= 4)
     then
     modify($userStatus){addBookToBooksLikedBySimilarUsers($book)}
+end
+
+rule "author write in user fav genre":
+    agenda-group "fav genre"
+    lock-on-active
+    when
+    $userStatus: UserStatus()
+    $User: User(getId()==$userStatus.getUserId(), $genres: favouriteGenres)
+    $author: Author()
+
+    then
 end
 /*
 rule "recommend 10 best books if user chose his favourite genres"
