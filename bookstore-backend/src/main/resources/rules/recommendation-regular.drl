@@ -52,7 +52,7 @@ rule "Find books similar to books user likes"
     lock-on-active
     when
         $userStatus: UserStatus()
-        $user: User($favBooks: getBooksUserLikes())
+        $user: User(getId()==$userStatus.getUserId(), $favBooks: getBooksUserLikes())
         $book1: Book($reviews: reviews) from $favBooks
         $book2: Book(id != $book1.getId())
         $all : Number(floatValue > 0) from accumulate (
@@ -75,6 +75,36 @@ rule "Find books similar to books user likes"
                 )
     then
         modify($userStatus){addBookToSimilarBooks($book2)}
+end
+
+rule "similar users"
+    agenda-group "books"
+    lock-on-active
+    when
+    $userStatus: UserStatus()
+    $regularUser: User(getId()==$userStatus.getUserId(), $regularAvgRating: getAverageRating(), $reviews: getReviews())
+    $user: User(getId()!=$regularUser.getId(), $userAvgRating: getAverageRating())
+    Number(doubleValue >= 0.5) from accumulate (
+        $r:Review($user.getRatingForBook(getBook().getId()) != -1
+        ) from $reviews,
+        init(double sum1=0; double sum2 = 0; double sum3=0;),
+        action(sum1 += ($user.getRatingForBook($r.getBook().getId()) - $userAvgRating)*($user.getRatingForBook($r.getBook().getId()) - $userAvgRating);
+               sum2 += ($r.getRating() - $regularAvgRating)*($r.getRating() - $regularAvgRating);
+               sum3 += ($r.getRating() - $regularAvgRating)*($user.getRatingForBook($r.getBook().getId()) - $userAvgRating);),
+        result(sum1*sum2 !=0 ? sum3/(Math.sqrt(sum2)*Math.sqrt(sum3)) : 0)
+    )
+    then
+    modify($userStatus){addUserToSimilarUsers($user)};
+end
+rule "books liked by similar users"
+    agenda-group "similar-users-books"//vidi
+    lock-on-active
+    when
+    $userStatus: UserStatus($similarUsers: getSimilarUsers())
+    $user: User($similarUsers.contains($user))
+    $book: Book($user.getRatingForBook(getId()) >= 4)
+    then
+    modify($userStatus){addBookToBooksLikedBySimilarUsers($book)}
 end
 /*
 rule "recommend 10 best books if user chose his favourite genres"

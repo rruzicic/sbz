@@ -14,24 +14,51 @@ public class UserStatus {
     private List<Book> booksSimilarToBooksUserLikes;
     private List<Book> interestingBooks;
 
+    private List<User> similarUsers;
+    private long userId;
 
-    public UserStatus(){
+
+    public UserStatus(long userId) {
+        this.userId = userId;
         isUserNew = true;
         hasChosenFavouriteGenres = false;
         booksLikedBySimilarUsers = new ArrayList<Book>();
         tenMostPopularBooksByFourAuthors = new ArrayList<Book>();
         booksSimilarToBooksUserLikes = new ArrayList<Book>();
         interestingBooks = new ArrayList<Book>();
+        similarUsers = new ArrayList<User>();
     }
 
-    public void addBookToSimilarBooks(Book book)
-    {
-        for(Book b: booksSimilarToBooksUserLikes)
-        {
+    public long getUserId() {
+        return userId;
+    }
+
+    public void addBookToSimilarBooks(Book book) {
+        for (Book b : booksSimilarToBooksUserLikes) {
             if (b.getId() == book.getId())
                 return;
         }
         booksSimilarToBooksUserLikes.add(book);
+    }
+    public void addBookToBooksLikedBySimilarUsers(Book book) {
+        for (Book b : booksLikedBySimilarUsers) {
+            if (b.getId() == book.getId())
+                return;
+        }
+        booksLikedBySimilarUsers.add(book);
+    }
+
+
+    public void addUserToSimilarUsers(User user) {
+        for (User u : similarUsers) {
+            if (u.getId() == user.getId())
+                return;
+        }
+        similarUsers.add(user);
+    }
+
+    public List<User> getSimilarUsers(){
+        return similarUsers;
     }
 
     public boolean getIsUserNew(){
@@ -66,4 +93,6 @@ public class UserStatus {
     public void setInterestingBooks(List<Book> interestingBooks) {
         this.interestingBooks = interestingBooks;
     }
+
+
 }

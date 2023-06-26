@@ -79,13 +79,18 @@ public class BookService {
 		for (Book book: books) {
 			kieSession.insert(book);
 		}
-
+		List<User> allUsers = userRepository.findAll();
+		for (User user: allUsers) {
+			if(user.getId() == userId)
+				continue;
+			kieSession.insert(user);
+		}
 		User regularUser = userRepository.findById(userId).get();
 		kieSession.insert(regularUser);
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
 		kieSession.insert(recommendedBooks);
-		UserStatus userStatus = new UserStatus();
-		var books3 = 	getBooksSimilarToBooksUserLikes(userId);
+		UserStatus userStatus = new UserStatus(userId);
+		var books3 = 	getBooksLikedBySimilarUsers(userId);
 		//userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
 
 		//userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
@@ -104,6 +109,8 @@ public class BookService {
 		//kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("books").setFocus();
 		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("similar-users-books").setFocus();
+		kieSession.fireAllRules();
 		//kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
 		//kieSession.fireAllRules();
 		//kieSession.getAgenda().getAgendaGroup("final").setFocus();
@@ -114,7 +121,7 @@ public class BookService {
 		}
 
 		//return recommendedBooks.getRecommendedBooks();
-		return userStatus.getBooksSimilarToBooksUserLikes();
+		return userStatus.getBooksLikedBySimilarUsers();
 	}
 
 	public Book getById(Long id) {

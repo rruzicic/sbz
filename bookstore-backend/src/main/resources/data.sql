@@ -73,9 +73,9 @@ INSERT INTO item (discount, quantity, book_id, order_id) VALUES (5, 2, 3, 2);
 INSERT INTO item (discount, quantity, book_id, order_id) VALUES (0, 1, 4, 2);
 
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 3);
-INSERT INTO review (rating, book_id, user_id) VALUES (2, 4, 2);
+INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
 
-INSERT INTO review (rating, book_id, user_id) VALUES (5, 2, 2);
+INSERT INTO review (rating, book_id, user_id) VALUES (5, 1, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 1, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 2);
@@ -164,7 +164,7 @@ INSERT INTO review (rating, book_id, user_id) VALUES (1, 5, 3);
 INSERT INTO review (rating, book_id, user_id) VALUES (2, 5, 3);
 
 INSERT INTO review (rating, book_id, user_id) VALUES (4, 2, 1);
-INSERT INTO review (rating, book_id, user_id) VALUES (3, 1, 1);
+INSERT INTO review (rating, book_id, user_id) VALUES (5, 1, 1);
 INSERT INTO user_favourite_genres (user_id, genre) VALUES (1, 'NOVEL');
 INSERT INTO user_favourite_genres (user_id, genre) VALUES (1, 'EDUCATION');
 INSERT INTO user_favourite_genres (user_id, genre) VALUES (2, 'NOVEL');
