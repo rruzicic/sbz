@@ -16,8 +16,9 @@ rule "User is new if he has less than 10 reviews"
     agenda-group "user-new"
     lock-on-active
     when
-        $user: User(reviews.size() < 10)
         $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), reviews.size() < 10)
+
     then
         modify($userStatus) { setIsUserNew(true); }
 end
@@ -26,8 +27,8 @@ rule "User is NOT new if he has more or equal to 10 reviews"
     agenda-group "user-new"
     lock-on-active
     when
-        $user: User(reviews.size() >= 10)
         $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), reviews.size() >= 10)
     then
         modify($userStatus) { setIsUserNew(false); }
 end
@@ -36,8 +37,8 @@ rule "User did NOT choose his favourite genres"
     agenda-group "user-choose-genres"
     lock-on-active
     when
-        $user: User(favouriteGenres.isEmpty())
         $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), favouriteGenres.isEmpty())
     then
         modify($userStatus) { setHasChosenFavouriteGenres(false); }
 end
@@ -46,18 +47,19 @@ rule "User did choose his favourite genres"
     agenda-group "user-choose-genres"
     lock-on-active
     when
-        $user: User(!favouriteGenres.isEmpty())
         $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), !favouriteGenres.isEmpty())
+
     then
         modify($userStatus) {setHasChosenFavouriteGenres(true);}
 end
 
 
-rule "Find books similar to books user likes"
+rule "Find books similar to books user likes" salience 150
     agenda-group "books"
     lock-on-active
     when
-        $userStatus: UserStatus()
+        $userStatus: UserStatus(isUserNew==false)
         $user: User(getId()==$userStatus.getUserId(), $favBooks: getBooksUserLikes())
         $book1: Book($reviews: reviews) from $favBooks
         $book2: Book(id != $book1.getId())
@@ -83,11 +85,11 @@ rule "Find books similar to books user likes"
         modify($userStatus){addBookToSimilarBooks($book2)}
 end
 
-rule "similar users"
+rule "similar users" salience 100
     agenda-group "books"
     lock-on-active
     when
-    $userStatus: UserStatus()
+    $userStatus: UserStatus(isUserNew==false)
     $regularUser: User(getId()==$userStatus.getUserId(), $regularAvgRating: getAverageRating(), $reviews: getReviews())
     $user: User(getId()!=$regularUser.getId(), $userAvgRating: getAverageRating())
     Number(doubleValue >= 0.5) from accumulate (
@@ -102,11 +104,11 @@ rule "similar users"
     then
     modify($userStatus){addUserToSimilarUsers($user)};
 end
-rule "books liked by similar users"
-    agenda-group "similar-users-books"
+rule "books liked by similar users" salience 30
+    agenda-group "similar-users"
     lock-on-active
     when
-    $userStatus: UserStatus($similarUsers: getSimilarUsers())
+    $userStatus: UserStatus(isUserNew==false, $similarUsers: getSimilarUsers())
     $user: User($similarUsers.contains($user))
     $book: Book($user.getRatingForBook(getId()) >= 4)
     then
@@ -119,7 +121,7 @@ rule "Get Eligible Authors" salience 100
     lock-on-active
     when
         $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors(), $allGenres: getAllGenres())
-        $user: User($favGenres: getFavouriteGenres())
+        $user: User(getId()==$userStatus.getUserId(), $favGenres: getFavouriteGenres())
         $author: Author()
         $totalNumOfBooksByAuthor: Number() from accumulate(
             $book: Book(author.getId() == $author.getId()),
@@ -153,7 +155,6 @@ rule "Get Books By Eligible Authors"
         $book: Book($book.getAuthor() memberOf $userStatus.getEligibleAuthors())
 
     then
-        System.out.println($userStatus.getEligibleAuthors().size());
         modify($userStatus){addToBooksByEligibleAuthors($book);}
 end
 
@@ -163,8 +164,7 @@ rule "Sort Books By Popularity"
     when
         $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $booksByEligibleAuthors: getBooksByEligibleAuthors())
     then
-        modify($userStatus){setBooksByEligibleAuthors($userStatus.sortBooksByPopularity2($booksByEligibleAuthors));}
-        modify($userStatus){setTenMostPopularBooksByFourAuthors($booksByEligibleAuthors);}
+        modify($userStatus){setTenMostPopularBooksByFourAuthors($userStatus.sortBooksByPopularity2($booksByEligibleAuthors));}
 end
 
 
@@ -175,6 +175,7 @@ rule "recommend 10 best books if user chose his favourite genres"
         $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true)
         $recommendation: RegularUserRecommendedBooks()
     then
+        System.out.println("aaaaa");
         modify($recommendation) {setRecommendedBooks($userStatus.getTenMostPopularBooksByFourAuthors());}
 end
 

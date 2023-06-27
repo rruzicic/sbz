@@ -105,15 +105,13 @@ public class BookService {
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
-		var authors = getInterestingAuthorsForUser(userId);
+		//var authors = getInterestingAuthorsForUser(userId);
 		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
 		kieSession.fireAllRules();
 
 		kieSession.getAgenda().getAgendaGroup("books").setFocus();
-		kieSession.fireAllRules();
-		kieSession.getAgenda().getAgendaGroup("similar-users-books").setFocus();
 		kieSession.fireAllRules();
 
 		kieSession.getAgenda().getAgendaGroup("10-best-books").setFocus();
