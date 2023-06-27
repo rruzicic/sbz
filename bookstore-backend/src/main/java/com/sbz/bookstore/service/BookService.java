@@ -87,7 +87,8 @@ public class BookService {
 		UserStatus userStatus = new UserStatus();
 		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
 
-		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
+		userStatus.setAllBooks(bookRepository.findAll());
+		//userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
 
 		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
 
@@ -113,6 +114,8 @@ public class BookService {
 		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
+		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("10-best-books").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("interesting-books").setFocus();
 		kieSession.fireAllRules();
@@ -248,6 +251,16 @@ public class BookService {
 		return sortedList;
 	}
 
+	public List<Book> sortBooksByPopularity(List<Book> books){
+		books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+		if (books.size() >= 10) {
+			return books.subList(0, 10);
+		}
+		else { //Just in case there is not even 10 books in the list.
+			return books;
+		}
+	}
+
 	public List<Author> getFourMostPopularAuthors(long userId){
 		User user = userRepository.findById(userId).get();
 		List<Author> eligibleAuthors = new ArrayList<>();
@@ -377,5 +390,35 @@ public class BookService {
 			}
 		}
 		return interestingBooks;
+	}
+
+	public List<Author> sortAuthorsByPopularity2(List<Author> eligibleAuthors){
+		Map<Author, Integer> authorPopularityMap = new HashMap<Author, Integer>();
+		for (Author author: eligibleAuthors) {
+			authorPopularityMap.put(author, getAuthorPopularity(author));
+		}
+		List<Entry<Author, Integer>> nlist = new ArrayList<>(authorPopularityMap.entrySet());
+		nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
+
+		List<Author> sortedList = new ArrayList<>();
+		for (Entry<Author, Integer> entry: nlist){
+			sortedList.add(entry.getKey());
+		}
+		if (sortedList.size()>=4){
+			return sortedList.subList(0,4);
+		}
+		else{ //just in case there are not even 4 authors in the list
+			return sortedList;
+		}
+	}
+
+	public List<Book> sortBooksByPopularity2(List<Book> books){
+		books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+		if (books.size() >= 10) {
+			return books.subList(0, 10);
+		}
+		else { //Just in case there is not even 10 books in the list.
+			return books;
+		}
 	}
 }

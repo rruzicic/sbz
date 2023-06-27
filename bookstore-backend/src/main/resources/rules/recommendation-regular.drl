@@ -6,6 +6,10 @@ import com.sbz.bookstore.model.Author;
 import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
 import com.sbz.bookstore.model.facts.UserStatus;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import com.sbz.bookstore.service.BookService;
 
 rule "User is new if he has less than 10 reviews"
     agenda-group "user-new"
@@ -45,6 +49,58 @@ rule "User did choose his favourite genres"
         $userStatus: UserStatus()
     then
         modify($userStatus) {setHasChosenFavouriteGenres(true);}
+end
+
+rule "Get Eligible Authors" salience 100
+    agenda-group "10-best-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors(), $allGenres: getAllGenres())
+        $user: User($favGenres: getFavouriteGenres())
+        $author: Author()
+        $totalNumOfBooksByAuthor: Number() from accumulate(
+            $book: Book(author.getId() == $author.getId()),
+            count($book)
+        )
+        $genre: Genre() from $favGenres
+        $count: Number() from accumulate(
+            $book: Book(genre == $genre, author.getId() == $author.getId()),
+            count($book)
+        )
+        eval(($count.floatValue() / $totalNumOfBooksByAuthor.floatValue()) >= (30.0/100.0))
+        //Author belongs do genre after this
+    then
+        modify($userStatus){addToEligibleAuthors($author);}
+end
+
+rule "Sort Eligible Authors"
+    agenda-group "10-best-books" salience 90
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors(), $allGenres: getAllGenres())
+    then
+        modify($userStatus){setEligibleAuthors($userStatus.sortAuthorsByPopularity2($eligibleAuthors));}
+end
+
+rule "Get Books By Eligible Authors"
+    agenda-group "10-best-books" salience 80
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors())
+        //$book: Book($book.getAuthor() memberOf $eligibleAuthors)
+        $book: Book($author: getAuthor(),$author memberOf $eligibleAuthors)
+    then
+        modify($userStatus){addToBooksByEligibleAuthors($book);}
+end
+
+rule "Sort Books By Popularity"
+    agenda-group "10-best-books" salience 70
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $booksByEligibleAuthors: getBooksByEligibleAuthors())
+    then
+        modify($userStatus){setBooksByEligibleAuthors($userStatus.sortBooksByPopularity2($booksByEligibleAuthors));}
+        modify($userStatus){setTenMostPopularBooksByFourAuthors($booksByEligibleAuthors);}
 end
 
 rule "recommend 10 best books if user chose his favourite genres"
@@ -138,3 +194,42 @@ rule "Sort the list by recommendation points"
     then
         modify($recommendationList){sortByRecommendationPoints();}
 end
+
+
+
+
+
+
+
+
+/*
+function List sortAuthorsByPopularity2(List eligibleAuthors){
+    Map<Author, Integer> authorPopularityMap = new HashMap<Author, Integer>();
+    for (Author author: eligibleAuthors) {
+        authorPopularityMap.put(author, getAuthorPopularity(author));
+    }
+    List<Entry<Author, Integer>> nlist = new ArrayList<>(authorPopularityMap.entrySet());
+    nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
+
+    List<Author> sortedList = new ArrayList<>();
+    for (Entry<Author, Integer> entry: nlist){
+        sortedList.add(entry.getKey());
+    }
+    if (sortedList.size()>=4){
+        return sortedList.subList(0,4);
+    }
+    else{ //just in case there are not even 4 authors in the list
+        return sortedList;
+    }
+}
+
+function List sortBooksByPopularity2(List books){
+    books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+    if (books.size() >= 10) {
+        return books.subList(0, 10);
+    }
+    else { //Just in case there is not even 10 books in the list.
+        return books;
+    }
+}
+*/
