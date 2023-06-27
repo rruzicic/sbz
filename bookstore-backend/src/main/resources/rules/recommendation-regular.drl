@@ -83,18 +83,20 @@ rule "Sort Eligible Authors"
 end
 
 rule "Get Books By Eligible Authors"
-    agenda-group "10-best-books" salience 80
+    agenda-group "10-best-books-author" salience 80
     lock-on-active
     when
-        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors())
-        //$book: Book($book.getAuthor() memberOf $eligibleAuthors)
-        $book: Book($author: getAuthor(),$author memberOf $eligibleAuthors)
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true,  getEligibleAuthors().size() ==4 )
+        $book: Book($book.getAuthor() memberOf $userStatus.getEligibleAuthors())
+        //$author: Author($userStatus.isEligibleAuthor($author))
+       // $book: Book(getAuthor().getId() == $author.getId() )//,$author memberOf $eligibleAuthors $eligibleAuthors.contains($author)
     then
+        System.out.println($userStatus.getEligibleAuthors().size());
         modify($userStatus){addToBooksByEligibleAuthors($book);}
 end
 
 rule "Sort Books By Popularity"
-    agenda-group "10-best-books" salience 70
+    agenda-group "10-best-books-author" salience 70
     lock-on-active
     when
         $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $booksByEligibleAuthors: getBooksByEligibleAuthors())

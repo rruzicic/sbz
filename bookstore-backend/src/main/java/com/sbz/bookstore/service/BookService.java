@@ -113,8 +113,11 @@ public class BookService {
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("10-best-books").setFocus();
 		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("10-best-books-author").setFocus();
+		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("interesting-books").setFocus();
 		kieSession.fireAllRules();
+
 		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("final").setFocus();

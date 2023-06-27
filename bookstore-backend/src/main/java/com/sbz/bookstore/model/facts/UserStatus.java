@@ -216,4 +216,14 @@ public class UserStatus {
             return books;
         }
     }
+
+    public boolean isEligibleAuthor(Author a)
+    {
+        for(Author author: eligibleAuthors)
+        {
+            if(author.getId()==a.getId())
+                return true;
+        }
+        return false;
+    }
 }
