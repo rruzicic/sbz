@@ -102,11 +102,7 @@ public class BookService {
 		{
 			kieSession.insert(author);
 		}
-		List<Book> allBooks = bookRepository.findAll();
-		for(Book book: allBooks)
-		{
-			kieSession.insert(book);
-		}
+
 
 
 		//TODO Fire rules from the rules engine
@@ -130,7 +126,7 @@ public class BookService {
 			System.out.println("stari korisnik");
 		}
 
-		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
+		if(userStatus.getHasChosenFavouriteGenres() == false && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();
 		}
 
