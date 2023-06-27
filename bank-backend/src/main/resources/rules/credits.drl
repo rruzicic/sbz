@@ -7,47 +7,6 @@ import java.util.Date;
 // https://www.forbes.com/advisor/personal-loans/personal-loan-requirements/
 // https://www.investopedia.com/financial-edge/0411/5-things-you-need-to-be-pre-approved-for-a-mortgage.aspx
 
-function double calculateSumBalance(List bankAccounts) {
-    List<BankAccount> bankAccountsTyped = (List<BankAccount>) bankAccounts;
-    double sum = 0.0;
-    
-    for(BankAccount bankAccount : bankAccountsTyped) {
-        sum += bankAccount.getBalance();
-    }
-
-    return sum;
-}
-
-function double calculateCreditMonthlyPayment(double creditAmount, int rateNumber) {
-    return creditAmount / rateNumber;
-}
-
-function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests) {
-    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
-    double sum = 0.0;
-
-    for(CreditRequest creditRequest : creditRequests) {
-        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED) {
-            sum += calculateCreditMonthlyPayment(creditRequest.getMoneySum(), creditRequest.getRateNumber());
-        }
-    }
-
-    return sum;
-}
-
-function int numberOfMissedLoanPayments(List ongoingCreditRequests) {
-    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
-    int ctr = 0;
-
-    for(CreditRequest creditRequest : creditRequests) {
-        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED && creditRequest.isMissedPayment() || creditRequest.isPaymentOverdue()) {
-            ctr += 1;
-        }
-    }
-
-    return ctr;
-}
-
 
 rule "Say hi when a new credit req comes up"
     no-loop
@@ -105,3 +64,44 @@ query clientMissedLoanPayment()
         numberOfMissedLoanPayments(client.creditRequests) >= 1
     )
 end
+
+function double calculateSumBalance(List bankAccounts) {
+    List<BankAccount> bankAccountsTyped = (List<BankAccount>) bankAccounts;
+    double sum = 0.0;
+
+    for(BankAccount bankAccount : bankAccountsTyped) {
+        sum += bankAccount.getBalance();
+    }
+
+    return sum;
+}
+
+function double calculateCreditMonthlyPayment(double creditAmount, int rateNumber) {
+    return creditAmount / rateNumber;
+}
+
+function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests) {
+    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
+    double sum = 0.0;
+
+    for(CreditRequest creditRequest : creditRequests) {
+        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED) {
+            sum += calculateCreditMonthlyPayment(creditRequest.getMoneySum(), creditRequest.getRateNumber());
+        }
+    }
+
+    return sum;
+}
+
+function int numberOfMissedLoanPayments(List ongoingCreditRequests) {
+    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
+    int ctr = 0;
+
+    for(CreditRequest creditRequest : creditRequests) {
+        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED && creditRequest.isMissedPayment() || creditRequest.isPaymentOverdue()) {
+            ctr += 1;
+        }
+    }
+
+    return ctr;
+}
