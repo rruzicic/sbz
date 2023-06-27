@@ -85,43 +85,61 @@ public class BookService {
 				continue;
 			kieSession.insert(user);
 		}
+
+		List<Author> allAuthors = authorRepository.findAll();
+		for(Author author: allAuthors)
+		{
+			kieSession.insert(author);
+		}
 		User regularUser = userRepository.findById(userId).get();
 		kieSession.insert(regularUser);
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
 		kieSession.insert(recommendedBooks);
 		UserStatus userStatus = new UserStatus(userId);
 
-		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
+		userStatus.setAllBooks(bookRepository.findAll());
 
-		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
-
-		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
-
-		userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
+		userStatus.setBoughtBooks(getBoughtBooks(userId));
+		userStatus.setAllAuthors(authorRepository.findAll());
 
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
-
+		var authors = getInterestingAuthorsForUser(userId);
 		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
 		kieSession.fireAllRules();
+
 		kieSession.getAgenda().getAgendaGroup("books").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("similar-users-books").setFocus();
 		kieSession.fireAllRules();
+
+		kieSession.getAgenda().getAgendaGroup("10-best-books").setFocus();
+		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("10-best-books-author").setFocus();
+		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("interesting-books").setFocus();
+		kieSession.fireAllRules();
+
 		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("final").setFocus();
 		kieSession.fireAllRules();
 
-		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
+		if(userStatus.getIsUserNew() == true){
+			System.out.println("nov korisnik");
+		} else{
+			System.out.println("stari korisnik");
+		}
+
+		if(userStatus.getHasChosenFavouriteGenres() == false && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();
 		}
 
-		//return recommendedBooks.getRecommendedBooks();
-		return userStatus.getBooksLikedBySimilarUsers();
+		return recommendedBooks.getRecommendedBooks();
+
 	}
 
 	public Book getById(Long id) {
@@ -236,6 +254,16 @@ public class BookService {
 			sortedList.add(entry.getKey());
 		}
 		return sortedList;
+	}
+
+	public List<Book> sortBooksByPopularity(List<Book> books){
+		books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+		if (books.size() >= 10) {
+			return books.subList(0, 10);
+		}
+		else { //Just in case there is not even 10 books in the list.
+			return books;
+		}
 	}
 
 	public List<Author> getFourMostPopularAuthors(long userId){
@@ -367,5 +395,35 @@ public class BookService {
 			}
 		}
 		return interestingBooks;
+	}
+
+	public List<Author> sortAuthorsByPopularity2(List<Author> eligibleAuthors){
+		Map<Author, Integer> authorPopularityMap = new HashMap<Author, Integer>();
+		for (Author author: eligibleAuthors) {
+			authorPopularityMap.put(author, getAuthorPopularity(author));
+		}
+		List<Entry<Author, Integer>> nlist = new ArrayList<>(authorPopularityMap.entrySet());
+		nlist.sort(Entry.comparingByValue(Comparator.reverseOrder()));
+
+		List<Author> sortedList = new ArrayList<>();
+		for (Entry<Author, Integer> entry: nlist){
+			sortedList.add(entry.getKey());
+		}
+		if (sortedList.size()>=4){
+			return sortedList.subList(0,4);
+		}
+		else{ //just in case there are not even 4 authors in the list
+			return sortedList;
+		}
+	}
+
+	public List<Book> sortBooksByPopularity2(List<Book> books){
+		books.sort(Comparator.comparingDouble(Book::getAverageRating).reversed());
+		if (books.size() >= 10) {
+			return books.subList(0, 10);
+		}
+		else { //Just in case there is not even 10 books in the list.
+			return books;
+		}
 	}
 }
