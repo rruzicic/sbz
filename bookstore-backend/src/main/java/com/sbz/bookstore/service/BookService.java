@@ -90,31 +90,31 @@ public class BookService {
 		RegularUserRecommendedBooks recommendedBooks = new RegularUserRecommendedBooks();
 		kieSession.insert(recommendedBooks);
 		UserStatus userStatus = new UserStatus(userId);
-		var books3 = 	getBooksLikedBySimilarUsers(userId);
-		//userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
 
-		//userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
+		userStatus.setBooksLikedBySimilarUsers(getBooksLikedBySimilarUsers(userId));
 
-		//userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
+		userStatus.setTenMostPopularBooksByFourAuthors(get10MostPopularBooksBy4Authors(userId));
 
-		//userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
+		userStatus.setBooksSimilarToBooksUserLikes(getBooksSimilarToBooksUserLikes(userId));
+
+		userStatus.setInterestingBooks(getInterestingBooksForUser(userId));
 
 		kieSession.insert(userStatus);
 
 		//TODO Fire rules from the rules engine
 
-		//kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
-		//kieSession.fireAllRules();
-		//kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
-		//kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("user-new").setFocus();
+		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("user-choose-genres").setFocus();
+		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("books").setFocus();
 		kieSession.fireAllRules();
 		kieSession.getAgenda().getAgendaGroup("similar-users-books").setFocus();
 		kieSession.fireAllRules();
-		//kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
-		//kieSession.fireAllRules();
-		//kieSession.getAgenda().getAgendaGroup("final").setFocus();
-		//kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("recommend-books").setFocus();
+		kieSession.fireAllRules();
+		kieSession.getAgenda().getAgendaGroup("final").setFocus();
+		kieSession.fireAllRules();
 
 		if(userStatus.getHasChosenFavouriteGenres() && userStatus.getIsUserNew()){
 			return getRecommendedUnauthorized();

@@ -107,17 +107,7 @@ rule "books liked by similar users"
     modify($userStatus){addBookToBooksLikedBySimilarUsers($book)}
 end
 
-rule "author write in user fav genre":
-    agenda-group "fav genre"
-    lock-on-active
-    when
-    $userStatus: UserStatus()
-    $User: User(getId()==$userStatus.getUserId(), $genres: favouriteGenres)
-    $author: Author()
 
-    then
-end
-/*
 rule "recommend 10 best books if user chose his favourite genres"
     agenda-group "recommend-books"
     lock-on-active
@@ -170,4 +160,3 @@ rule "Sort the list by recommendation points"
     then
         modify($recommendationList){sortByRecommendationPoints();}
 end
-*/
