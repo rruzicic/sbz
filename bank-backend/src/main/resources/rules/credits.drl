@@ -37,17 +37,33 @@ end
 
 // since we don't have assets per se, we will use current balance on all accounts
 query clientHasEnoughAssets()
-    CreditRequest(
-        calculateSumBalance(client.accounts) > (moneySum * 0.20)
+    (
+        $cr: CreditRequest($accounts: client.accounts) and
+        Number(doubleValue > $cr.getMoneySum()*0.2) from accumulate(
+            $account: BankAccount() from $accounts,
+            init(int sum=0;),
+            action(sum += $account.getBalance();),
+            result(sum)
+        )
+
     ) and clientHasGoodDTI()
 end
 
 // see if client has above 36% DTI to take on a new loan
 query clientHasGoodDTI()
-    CreditRequest(
-        clientIncome >= 1.36 * (calculateCurrentMonthlyDebtForClient(client.creditRequests) + calculateCreditMonthlyPayment(moneySum, rateNumber))
-    ) and clientCanPayThroughoutCreditLifecycle()
+
+    (
+        $c: CreditRequest($requests: client.creditRequests) and
+        //clientIncome >= 1.36 * (calculateCurrentMonthlyDebtForClient(client.creditRequests) + calculateCreditMonthlyPayment(moneySum, rateNumber))
+        Number(1.36*doubleValue + $c.getMoneySum()/$c.getRateNumber <= $c.getClientIncome()) from accumulate(
+            $r: CreditRequest(getCreditStatus() == CreditStatus.APPROVED) from $requests,
+            init(int sum=0),
+            action(sum += $r.getMoneySum() / $r.getRateNumber();)
+            result (sum)
+        )
+    )and clientCanPayThroughoutCreditLifecycle()
 end
+
 
 // see if a temp worker client's contract ends during credit payout
 // and if the client's contract starts before the min date payout
@@ -60,48 +76,14 @@ end
 
 // see if client missed a loan payment or didn't pay a previous loan
 query clientMissedLoanPayment()
-    not CreditRequest(
-        numberOfMissedLoanPayments(client.creditRequests) >= 1
-    )
+        not(
+        $cr: CreditRequest($requests: client.creditRequests) and
+        Number(intValue >= 1) from accumulate (
+            $r: CreditRequest(getCreditStatus() == CreditStatus.APPROVED
+            && isMissedPayment() || isPaymentOverdue()) from $requests,
+            count($r)
+        )
+        )
+
 end
 
-function double calculateSumBalance(List bankAccounts) {
-    List<BankAccount> bankAccountsTyped = (List<BankAccount>) bankAccounts;
-    double sum = 0.0;
-
-    for(BankAccount bankAccount : bankAccountsTyped) {
-        sum += bankAccount.getBalance();
-    }
-
-    return sum;
-}
-
-function double calculateCreditMonthlyPayment(double creditAmount, int rateNumber) {
-    return creditAmount / rateNumber;
-}
-
-function double calculateCurrentMonthlyDebtForClient(List ongoingCreditRequests) {
-    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
-    double sum = 0.0;
-
-    for(CreditRequest creditRequest : creditRequests) {
-        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED) {
-            sum += calculateCreditMonthlyPayment(creditRequest.getMoneySum(), creditRequest.getRateNumber());
-        }
-    }
-
-    return sum;
-}
-
-function int numberOfMissedLoanPayments(List ongoingCreditRequests) {
-    List<CreditRequest> creditRequests = (List<CreditRequest>) ongoingCreditRequests;
-    int ctr = 0;
-
-    for(CreditRequest creditRequest : creditRequests) {
-        if(creditRequest.getCreditStatus() == CreditStatus.APPROVED && creditRequest.isMissedPayment() || creditRequest.isPaymentOverdue()) {
-            ctr += 1;
-        }
-    }
-
-    return ctr;
-}
