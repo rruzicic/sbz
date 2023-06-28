@@ -1,0 +1,110 @@
+import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.RatingLevel;
+import com.sbz.bookstore.model.facts.UnauthorizedUserRecommendedBooks;
+import java.time.LocalDate;
+
+rule "Is new if it was added to the bookstore one month ago"
+	agenda-group "age"
+	when
+		$book: Book(LocalDate.now().plusMonths(-1) < addedToBookstoreDate)
+	then
+		modify($book){ setNew_(true); }
+end
+
+rule "Is new if it was published 6 months ago"
+	agenda-group "age"
+	when
+		$book: Book(LocalDate.now().plusMonths(-6) < publishDate)
+	then
+		modify($book){ setNew_(true); }
+end
+
+rule "Is popular if it has 20 or more ratings"
+	agenda-group "popularity"
+	when
+    	$book: Book(reviews.size() >= 20)
+    then
+    	modify($book){ setPopular(true); }
+end
+
+rule "Is popular if it has 10 or more ratings and is new"
+	agenda-group "popularity"
+	when
+		$book: Book(reviews.size() >= 10, new_)
+	then
+		modify($book){ setPopular(true); }
+end
+
+
+rule "Is well rated if the average rating is 4 or more"
+	agenda-group "rating"
+	when
+		$book: Book(getAverageRating() >= 4.0)
+	then
+		modify($book){ setRating(RatingLevel.GOOD); }
+end
+
+rule "Is badly rated if the average rating 2.5 or less"
+	agenda-group "rating"
+	when
+		$book: Book(getAverageRating() <= 2.5)
+	then
+		modify($book){ setRating(RatingLevel.BAD); }
+end
+
+rule "Is neutrally rated if the average rating is between 2.5 and 4 or has no ratings yet"
+	agenda-group "rating"
+	when
+		$book: Book(getAverageRating() > 2.5, getAverageRating() < 4)
+	then
+		modify($book){ setRating(RatingLevel.NEUTRAL); }
+end
+
+rule "Is neutrally rated if the it has no ratings yet"
+	agenda-group "rating"
+	when
+		$book: Book(reviews.size() == 0)
+	then
+		modify($book){ setRating(RatingLevel.NEUTRAL); }
+end
+
+
+rule "Recommend popular and good or neutral book"
+	agenda-group "recommendation"
+	lock-on-active
+	when
+		$book: Book(popular, getRating == RatingLevel.NEUTRAL || getRating == RatingLevel.GOOD)
+		$recommendationList: UnauthorizedUserRecommendedBooks(!recommendedBooks.contains($book))
+	then
+		modify($recommendationList){ addToRecommended($book); }
+end
+
+rule "Recommend new"
+	agenda-group "recommendation"
+	lock-on-active
+	when
+		$book: Book(new_)
+		$recommendationList: UnauthorizedUserRecommendedBooks(!recommendedBooks.contains($book))
+	then
+		modify($recommendationList){ addToRecommended($book); }
+end
+
+rule "Remove badly rated books if there are more than 10"
+	agenda-group "remove"
+	lock-on-active
+	salience 0
+	when
+		$recommendationList: UnauthorizedUserRecommendedBooks()
+	then
+		modify($recommendationList){ removeBadBooks(); }
+end
+
+rule "Pick 10 random books"
+	agenda-group "remove"
+	lock-on-active
+	salience -1
+	when
+		$recommendationList: UnauthorizedUserRecommendedBooks()
+	then
+		modify($recommendationList){ pickTenRandomBooks(); }
+end

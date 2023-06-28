@@ -1,12 +1,16 @@
 package com.sbz.bookstore.controller;
 
+import com.sbz.bookstore.dto.LoggedUserBasicInfoDTO;
+import com.sbz.bookstore.dto.UserCredentialsDTO;
 import com.sbz.bookstore.model.User;
 import com.sbz.bookstore.service.UserService;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,12 +20,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping(value = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
 	@Autowired
 	private UserService userService;
 
+	@PostMapping("/login")
+	public ResponseEntity<?> login(@RequestBody UserCredentialsDTO credentials) {
+		User user = userService.login(credentials.getEmail(), credentials.getPassword());
+		if(user == null) { return ResponseEntity.badRequest().build(); }
+		LoggedUserBasicInfoDTO loggedUser = new LoggedUserBasicInfoDTO();
+		loggedUser.setRole(user.getRole());
+		loggedUser.setName(user.getName());
+		return ResponseEntity.ok(loggedUser);
+	}
+
+	@PreAuthorize("hasAnyRole('ADMIN')")
 	@GetMapping("/all")
 	public ResponseEntity<List<User>> getAll() {
 		return ResponseEntity.ok(userService.getAll());
@@ -32,9 +47,9 @@ public class UserController {
 		return ResponseEntity.ok(userService.getById(id));
 	}
 
-	@PostMapping("/new")
-	public ResponseEntity<User> createBook(@RequestBody User user) {
-		return ResponseEntity.ok(userService.createUser(user));
+	@PostMapping("/register")
+	public ResponseEntity<User> register(@RequestBody User user) {
+		return ResponseEntity.ok(userService.registerUser(user));
 	}
 
 	@PostMapping("/update")

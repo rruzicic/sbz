@@ -16,4 +16,5 @@ import lombok.experimental.FieldDefaults;
 public class Author extends BaseEntity {
 	@Column
 	String name;
+
 }

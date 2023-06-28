@@ -20,14 +20,23 @@ import lombok.experimental.FieldDefaults;
 public class Review extends BaseEntity {
 	@ManyToOne
 	@JoinColumn(name = "user_id", nullable = false)
-	@JsonBackReference
+	@JsonBackReference("userBackReference")
 	User user;
 
 	@ManyToOne
 	@JoinColumn(name = "book_id", nullable = false)
-	@JsonBackReference
+	@JsonBackReference("bookBackReference")
 	Book book;
 
 	@Column
 	double rating;
+
+	public boolean checkRatingSimilarity(double rating1, double rating2)
+	{
+		if(rating1==-1 || rating2==-1)
+			return false;
+		if(Math.abs(rating1 - rating2) <= 1)
+			return true;
+		return false;
+	}
 }

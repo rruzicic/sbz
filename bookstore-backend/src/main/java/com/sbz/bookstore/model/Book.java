@@ -1,5 +1,6 @@
 package com.sbz.bookstore.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDate;
@@ -15,6 +16,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -38,6 +41,9 @@ public class Book extends BaseEntity {
 	LocalDate publishDate;
 
 	@Column
+	int numberOfCopies;
+
+	@Column
 	LocalDate addedToBookstoreDate;
 
 	@Column
@@ -47,6 +53,39 @@ public class Book extends BaseEntity {
 	Genre genre;
 
 	@OneToMany(mappedBy = "book", orphanRemoval = true)
-	@JsonManagedReference
+	@JsonManagedReference("bookBackReference")
 	List<Review> reviews;
+
+	@JsonInclude
+	@Transient
+	boolean new_;
+	@JsonInclude
+	@Transient
+	boolean isPopular;
+	@JsonInclude
+	@Transient
+	RatingLevel rating;
+
+	@JsonInclude
+	@Transient
+	int recommendationPoints = 0;
+	@Transient
+	public double getAverageRating() {
+		if (reviews.size() == 0) return 0;
+		double ratingSum = 0;
+		for (Review review: reviews) {
+			ratingSum += review.getRating();
+		}
+		return ratingSum / reviews.size();
+	}
+
+	@Transient
+	public void incrementRecommendationPoints(int inc){
+		recommendationPoints += inc;
+	}
+
+	public boolean isBookNew()
+	{
+		return LocalDate.now().plusMonths(-1).compareTo(addedToBookstoreDate) < 0 || LocalDate.now().plusMonths(-6).compareTo(publishDate) < 0 ;
+	}
 }

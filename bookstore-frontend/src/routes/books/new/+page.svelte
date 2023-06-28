@@ -1,34 +1,57 @@
 <script>
+	import { onMount } from 'svelte';
 	import Input from '../../../lib/Input.svelte';
-	import { required, validate } from '../../../lib/util/validate';
+	import AuthorSelect from '../../../lib/AuthorSelect.svelte';
 	import axios from 'axios';
+	import { required, validate } from '../../../lib/util/validate';
 	import { toast } from '../../../lib/stores/toast';
+	import GenreSelectBook from '../../../lib/GenreSelectBook.svelte';
+
 	let book = {
 		name: '',
-		author: '',
+		author: {id: null},
 		publishDate: null,
-		description: ''
+		price: 0,
+		genre: 'EDUCATION',
+		numberOfCopies: 1
 	};
 
 	let bookValidator = {
 		name: [required],
-		author: [required],
+		author: [],
 		publishDate: [required],
-		description: [required]
+		price: [required],
+		genre: [],
+		numberOfCopies: []
 	};
 
 	$: [errorMessages, valid] = validate(book, bookValidator);
 
 	async function handleSubmit() {
+		let config = {
+        headers: {
+            Authorization: `Basic ${localStorage.getItem('access_token')}`,
+        }
+        };
 		const res = await axios
-			.post('http://localhost:8080/book/new', book)
+			.post('http://localhost:8080/book/new', book, config)
 			.then((res) => {
 				handleToast('Success!', 'You have successfully added new book to our bookstore!');
 			})
 			.catch((err) => {
 				handleToast('Error!', 'Could not save book to bookstore!');
+				console.log(err)
+				console.log(book)
 			});
 	}
+	let authorList = [];
+
+	onMount(() => {
+		axios.get("http://localhost:8080/author/all")
+		.then((res) => {
+			authorList = res.data;
+		})
+	});
 
 	function handleToast(title, text) {
 		$toast.id = 'liveToast';
@@ -36,40 +59,21 @@
 		$toast.text = text;
 		setTimeout(() => new bootstrap.Toast(document.querySelector('#liveToast')).show(), 10);
 	}
-
-	function sendToast() {
-		handleToast('Toast notification', 'Some toast notification!');
-	}
-
 </script>
 
 <h1>Add a new book</h1>
 
 <Input label="Name" bind:value={book.name} errors={errorMessages.name} />
-<Input label="Author" bind:value={book.author} errors={errorMessages.author} />
+<AuthorSelect authorList={authorList} bind:selected={book.author.id}/>
 <Input
 	label="Publish date"
 	type="date"
 	bind:value={book.publishDate}
 	errors={errorMessages.publishDate}
 />
+<Input type="number" label="Price" bind:value={book.price} errors={errorMessages.price} />
+<Input type="number" label="NumberOfCopies" bind:value={book.numberOfCopies} errors={errorMessages.numberOfCopies} />
+<GenreSelectBook bind:genre={book.genre}/>
 
-Description:
-<textarea
-	type="textarea"
-	class="form-control"
-	rows="3"
-	bind:value={book.description}
-	errors={errorMessages.description}
-/>
-<span class="text-danger">
-	{#each errorMessages.description as error}
-		{#if error !== ''}
-			{error}<br />
-		{/if}
-	{/each}
-</span>
 
 <button on:click={handleSubmit} class="btn btn-primary" disabled={!valid}>Submit</button>
-
-<button type="button" class="btn btn-danger" on:click={sendToast}>Join us</button>

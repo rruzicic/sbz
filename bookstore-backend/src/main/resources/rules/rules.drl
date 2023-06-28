@@ -1,0 +1,74 @@
+import com.sbz.bookstore.model.Order;
+import com.sbz.bookstore.model.Item;
+import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.Genre;
+import com.sbz.bookstore.model.facts.FinalDiscount;
+
+rule "Two or more item quantity 10% discount"
+    activation-group "item discounts" // so that only one rule out of the group is fired
+    salience 0 // so that in the rule stack the biggest discount is first
+    when
+        $i: Item(quantity > 2)
+    then
+        modify($i){setDiscount($i.getDiscount() + 0.1);}
+end
+
+rule "3000 or more item price 5% discount"
+    activation-group "item discounts"
+    salience -2
+    when
+        $i: Item(book.getPrice() * quantity >= 3000)
+    then
+        modify($i){setDiscount($i.getDiscount() + 0.05);}
+end
+
+rule "2000 or more item price and education 7% discount"
+    activation-group "item discounts"
+    salience -1
+    when
+        $i: Item(book.getPrice() * quantity >= 2000, book.getGenre() == Genre.EDUCATION)
+    then
+        modify($i){setDiscount($i.getDiscount() + 0.07);}
+end
+
+
+rule "3 or more items in order 10% discount"
+    activation-group "order discounts"
+    salience -1
+    when
+        $o: Order(items.size() >= 3)
+    then
+        modify($o){setDiscount($o.getDiscount() + 0.1);}
+        
+end
+
+rule "5 or more items in order 15% discount"
+    activation-group "order discounts"
+    salience 0
+    when
+        $o: Order(items.size() >= 5)
+    then
+        modify($o){setDiscount($o.getDiscount() + 0.15);}
+
+end
+
+rule "order discount is bigger than item discount"
+    activation-group "final discount"
+    when
+        $finalDiscount: FinalDiscount()
+        $order: Order(calculateOrderItemsPriceWithDiscount() < calculateOrderItemsPriceWithoutDiscount() * (1.0 - discount))
+    then
+        modify($finalDiscount){setFinalPrice($order.calculateOrderItemsPriceWithDiscount())}
+        System.out.println("rule1");
+end
+
+rule "item discount is bigger than order discount"
+    activation-group "final discount"
+    lock-on-active
+    when
+        $finalDiscount: FinalDiscount()
+        $order: Order(calculateOrderItemsPriceWithDiscount() >= calculateOrderItemsPriceWithoutDiscount() * (1.0 - discount))
+    then
+        modify($finalDiscount){setFinalPrice($order.calculateOrderItemsPriceWithoutDiscount()*(1-$order.getDiscount()))}
+        System.out.println("rule2");
+end

@@ -1,6 +1,11 @@
 <script>
+	import axios from 'axios';
 	import Input from '../../../lib/Input.svelte';
 	import { required, validate, validateEmail } from '../../../lib/util/validate';
+	import { toast } from '../../../lib/stores/toast';
+	import { user } from '../../../lib/stores/user';
+	import { goto } from '$app/navigation';
+
 	let credentials = {
 		email: '',
 		password: ''
@@ -11,18 +16,29 @@
 		password: [required]
 	};
 
-	/*
-	// you can pass this object as last parameter to validate function to create custom error messages
-	let credentialsErrMsg = {
-		email: ['Email is required', 'Email is not of correct format'],
-		password: ['Password is required']
-	};
-	*/
-
 	$: [credentialsErrOut, valid] = validate(credentials, credentialsValidation);
 
 	function handleLogin() {
-		// TODO: api request
+		axios.post('http://localhost:8080/user/login', credentials)
+		.then((res) => {
+			$user.email = credentials.email;
+			$user.password = credentials.password;
+			$user.base64token = btoa(credentials.email + ':' + credentials.password);
+			$user.role = res.data.role;
+			localStorage.setItem('access_token', btoa(credentials.email + ':' + credentials.password));
+			handleToast('Login', `Hi ${res.data.name}, welcome back!`)
+			goto(`/`, true) 
+		})
+		.catch((err) => {
+			handleToast('Ooops!', 'Wrong user credentials!')
+		})
+	}
+
+	function handleToast(title, text) {
+		$toast.id = 'liveToast';
+		$toast.title = title;
+		$toast.text = text;
+		setTimeout(() => new bootstrap.Toast(document.querySelector('#liveToast')).show(), 10);
 	}
 </script>
 
@@ -43,6 +59,6 @@
 
 	<button on:click={handleLogin} class="btn btn-primary" disabled={!valid}>Login</button>
 </form>
-<p>
+<!--<p>
 	{JSON.stringify(credentials)}
-</p>
+</p>-->

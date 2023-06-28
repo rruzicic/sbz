@@ -1,0 +1,263 @@
+import com.sbz.bookstore.model.Book;
+import com.sbz.bookstore.model.RatingLevel;
+import com.sbz.bookstore.model.Genre;
+import com.sbz.bookstore.model.User;
+import com.sbz.bookstore.model.Author;
+import com.sbz.bookstore.model.facts.RegularUserRecommendedBooks;
+import com.sbz.bookstore.model.facts.UserStatus;
+import com.sbz.bookstore.model.Review;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.*;
+import java.util.Map.Entry;
+import com.sbz.bookstore.service.BookService;
+
+rule "User is new if he has less than 10 reviews"
+    agenda-group "user-new"
+    lock-on-active
+    when
+        $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), reviews.size() < 10)
+
+    then
+        modify($userStatus) { setIsUserNew(true); }
+end
+
+rule "User is NOT new if he has more or equal to 10 reviews"
+    agenda-group "user-new"
+    lock-on-active
+    when
+        $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), reviews.size() >= 10)
+    then
+        modify($userStatus) { setIsUserNew(false); }
+end
+
+rule "User did NOT choose his favourite genres"
+    agenda-group "user-choose-genres"
+    lock-on-active
+    when
+        $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), favouriteGenres.isEmpty())
+    then
+        modify($userStatus) { setHasChosenFavouriteGenres(false); }
+end
+
+rule "User did choose his favourite genres"
+    agenda-group "user-choose-genres"
+    lock-on-active
+    when
+        $userStatus: UserStatus()
+        $user: User(getId()==$userStatus.getUserId(), !favouriteGenres.isEmpty())
+
+    then
+        modify($userStatus) {setHasChosenFavouriteGenres(true);}
+end
+
+
+rule "Find books similar to books user likes" salience 150
+    agenda-group "books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew==false)
+        $user: User(getId()==$userStatus.getUserId(), $favBooks: getBooksUserLikes())
+        $book1: Book($reviews: reviews) from $favBooks
+        $book2: Book(id != $book1.getId())
+        $all : Number(floatValue > 0) from accumulate (
+                 Review(getUser().getRatingForBook($book2.getId()) != -1
+
+                ) from $reviews,
+                //int numberOfSameRatings=0;numberOfSameRatings += $dist;numberOfSameRatings/
+                init(int numberOfReviewers=0; ),
+                action(numberOfReviewers += 1; ),
+                result((float)numberOfReviewers)
+        )
+        $same : Number(floatValue/$all.floatValue() > (float) 0.7) from accumulate (
+                        $r: Review(checkRatingSimilarity(getRating(), getUser().getRatingForBook($book2.getId()))
+
+                        ) from $reviews,
+                        //int numberOfSameRatings=0;numberOfSameRatings += $dist;numberOfSameRatings/
+                        init(int numberOfSameRatings=0; ),
+                        action(numberOfSameRatings += 1; ),
+                        result((float)numberOfSameRatings)
+                )
+    then
+        modify($userStatus){addBookToSimilarBooks($book2)}
+end
+
+rule "similar users" salience 100
+    agenda-group "books"
+    lock-on-active
+    when
+    $userStatus: UserStatus(isUserNew==false)
+    $regularUser: User(getId()==$userStatus.getUserId(), $regularAvgRating: getAverageRating(), $reviews: getReviews())
+    $user: User(getId()!=$regularUser.getId(), $userAvgRating: getAverageRating())
+    Number(doubleValue >= 0.5) from accumulate (
+        $r:Review($user.getRatingForBook(getBook().getId()) != -1
+        ) from $reviews,
+        init(double sum1=0; double sum2 = 0; double sum3=0;),
+        action(sum1 += ($user.getRatingForBook($r.getBook().getId()) - $userAvgRating)*($user.getRatingForBook($r.getBook().getId()) - $userAvgRating);
+               sum2 += ($r.getRating() - $regularAvgRating)*($r.getRating() - $regularAvgRating);
+               sum3 += ($r.getRating() - $regularAvgRating)*($user.getRatingForBook($r.getBook().getId()) - $userAvgRating);),
+        result(sum1*sum2 !=0 ? sum3/(Math.sqrt(sum2)*Math.sqrt(sum3)) : 0)
+    )
+    then
+    modify($userStatus){addUserToSimilarUsers($user)};
+end
+rule "books liked by similar users" salience 30
+    agenda-group "similar-users"
+    lock-on-active
+    when
+    $userStatus: UserStatus(isUserNew==false, $similarUsers: getSimilarUsers())
+    $user: User($similarUsers.contains($user))
+    $book: Book($user.getRatingForBook(getId()) >= 4)
+    then
+    modify($userStatus){addBookToBooksLikedBySimilarUsers($book)}
+end
+
+
+rule "Get Eligible Authors" salience 100
+    agenda-group "10-best-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors(), $allGenres: getAllGenres())
+        $user: User(getId()==$userStatus.getUserId(), $favGenres: getFavouriteGenres())
+        $author: Author()
+        $totalNumOfBooksByAuthor: Number() from accumulate(
+            $book: Book(author.getId() == $author.getId()),
+            count($book)
+        )
+        $genre: Genre() from $favGenres
+        $count: Number() from accumulate(
+            $book: Book(genre == $genre, author.getId() == $author.getId()),
+            count($book)
+        )
+        eval(($count.floatValue() / $totalNumOfBooksByAuthor.floatValue()) >= (30.0/100.0))
+        //Author belongs do genre after this
+    then
+        modify($userStatus){addToEligibleAuthors($author);}
+end
+
+rule "Sort Eligible Authors"
+    agenda-group "10-best-books" salience 90
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $eligibleAuthors: getEligibleAuthors(), $allGenres: getAllGenres())
+    then
+        modify($userStatus){setEligibleAuthors($userStatus.sortAuthorsByPopularity2($eligibleAuthors));}
+end
+
+rule "Get Books By Eligible Authors"
+    agenda-group "10-best-books-author" salience 80
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true,  getEligibleAuthors().size() ==4 )
+        $book: Book($book.getAuthor() memberOf $userStatus.getEligibleAuthors())
+
+    then
+        modify($userStatus){addToBooksByEligibleAuthors($book);}
+end
+
+rule "Sort Books By Popularity"
+    agenda-group "10-best-books-author" salience 70
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true, $booksByEligibleAuthors: getBooksByEligibleAuthors())
+    then
+        modify($userStatus){setTenMostPopularBooksByFourAuthors($userStatus.sortBooksByPopularity2($booksByEligibleAuthors));}
+end
+
+
+rule "recommend 10 best books if user chose his favourite genres"
+    agenda-group "recommend-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == true, hasChosenFavouriteGenres == true)
+        $recommendation: RegularUserRecommendedBooks()
+    then
+        System.out.println("aaaaa");
+        modify($recommendation) {setRecommendedBooks($userStatus.getTenMostPopularBooksByFourAuthors());}
+end
+
+
+rule "Book liked by similar user"
+    agenda-group "recommend-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false)
+        $book: Book($userStatus.getBooksLikedBySimilarUsers.contains($book))
+        $recommendationList: RegularUserRecommendedBooks()
+    then
+        modify($recommendationList){addToRecommended($book);}
+end
+
+rule "Book similar to books user likes"
+    agenda-group "recommend-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false)
+        $book: Book($userStatus.getBooksSimilarToBooksUserLikes.contains($book))
+        $recommendationList: RegularUserRecommendedBooks()
+    then
+         modify($recommendationList){addToRecommended($book);}
+end
+
+
+rule "Get Interesting Authors for User"
+    agenda-group "interesting-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks())
+        $author: Author()
+        Number(intValue >= 3) from accumulate(
+            $book: Book(author.getId() == $author.getId()) from $boughtBooks,
+            count($book)
+        )
+    then
+        modify($userStatus){addToInterestingAuthors($author);}
+end
+
+
+rule "Get Interesting Genres for User"
+    agenda-group "interesting-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false, $boughtBooks: getBoughtBooks(), $allGenres: getAllGenres(), $interestingGenres: getInterestingGenres())
+        $books: Book() from $boughtBooks // Retrieve bought books for the user
+        $totalNumOfBooks: Long() from accumulate(
+            $book: Book() from $books,
+            count($book)
+        )
+        $genre: Genre() from $allGenres
+        $count: Long() from accumulate(
+            $book: Book(genre == $genre) from $books,
+            count($book)
+        )
+        eval(($count.floatValue() / $totalNumOfBooks.floatValue()) >= (30.0/100.0))
+    then
+        modify($userStatus){addToInterestingGenres($genre);}
+end
+
+
+rule "Recommend books that would be interesting to user"
+    agenda-group "recommend-books"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false, $interestingGenres: getInterestingGenres(), $interestingAuthors: getInterestingAuthors())
+        $recommendationList: RegularUserRecommendedBooks()
+        $book: Book($book.getAuthor() memberOf $interestingAuthors || $book.getGenre() memberOf $interestingGenres)
+    then
+        modify($userStatus){addToInterestingBooks($book);}
+        modify($recommendationList){addToRecommended($book);}
+end
+
+rule "Sort the list by recommendation points"
+    agenda-group "final"
+    lock-on-active
+    when
+        $userStatus: UserStatus(isUserNew == false)
+        $recommendationList: RegularUserRecommendedBooks()
+    then
+        modify($recommendationList){sortByRecommendationPoints();}
+end
+

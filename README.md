@@ -8,4 +8,4 @@ To run the backend you can open `bookstore-backend` as an IntelliJ project and r
 
 Backend uses the H2 in-memory database, to access its admin panel navigate to `localhost:8080/h2-console`, login credentials are: username: sa, password: *empty*.
 
-You can also access Swagger docs by navigating to `locahost:8080/swagger-ui/`. *Note the trailing `/` at the end*.
+You can also access Swagger docs by navigating to `localhost:8080/swagger-ui/`. *Note the trailing `/` at the end*.
