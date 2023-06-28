@@ -1,4 +1,4 @@
-package com.sbz.bookstore;
+package com.sbz.bank;
 
 import com.sbz.bank.model.Location;
 
