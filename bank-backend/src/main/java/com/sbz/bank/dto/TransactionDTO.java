@@ -18,6 +18,17 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransactionDTO {
+
+	public TransactionDTO() {
+
+	}
+	public TransactionDTO(long receiverId, int cvv, LocalDateTime expiryDate, double amount, Location location) {
+		this.receiverId = receiverId;
+		this.cvv = cvv;
+		this.expiryDate = expiryDate;
+		this.amount = amount;
+		this.location = location;
+	}
 	@NotNull
 	@Min(1)
 	Long receiverId;
